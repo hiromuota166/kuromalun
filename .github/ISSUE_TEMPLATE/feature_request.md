@@ -1,16 +1,20 @@
 ---
 name: Feature request
-about: Suggest an idea for this project
+about: 機能の追加をしたいとき
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-# 概要
+### As Is
+（今の状態を記載）
 
-# 理由・目的
+### To Be 
+（理想の状態を記載。タスク完了の条件にもなる。）
 
-## タスク
+### アクション
+（改善のための具体的なアクションを記載）
 
-- [ ] 細かいタスクに分解できているなら書き出す
+### 課題
+（現状分かっている課題を記載）
