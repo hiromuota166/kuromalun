@@ -18,13 +18,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ChakraProvider>
-      <html lang="en">
-        <Header />
-        <body className={inter.className}>
+    <html lang="en">
+      <body className={inter.className}>
+        <ChakraProvider>
+          <Header />
           {children}
-        </body>
-      </html>
-    </ChakraProvider>
+        </ChakraProvider>
+      </body>
+    </html>
   );
 }
