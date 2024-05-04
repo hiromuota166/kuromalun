@@ -1,57 +1,7 @@
 export default function Home() {
   return (
     <div>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
-      <h1>Ho</h1>
+      <h1>Home</h1>
     </div>
   );
 }

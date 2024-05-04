@@ -15,10 +15,10 @@ const config: Config = {
       },
     },
     colors: {
-      background: "#000000",
+      backgroundColor: "#000000",
       mainColor: "#ffffff",
       color: "#9F9F9F",
-      emphasis: "#FEB06A",
+      emphasisColor: "#FEB06A",
     },
   },
   plugins: [],
