@@ -1,5 +1,4 @@
 'use client'
-import { SettingsIcon } from '@chakra-ui/icons'
 
 const Header = () => {
   return (
