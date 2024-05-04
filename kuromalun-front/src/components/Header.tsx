@@ -3,7 +3,7 @@ import { SettingsIcon } from '@chakra-ui/icons'
 
 const Header = () => {
   return (
-    <header className="shadow-boxOut bg-background flex justify-between">
+    <header className="shadow-boxOut bg-background fixed flex w-full justify-between">
       <div>
         <h1 className="p-4 pt-6 text-3xl text-font">
           <a href="/" className='text-maincolor'>kuromalun</a>
