@@ -7,7 +7,7 @@ import FooterIcon from './FooterIcon';
 const Footer = () => {
   return (
     <div className='fixed inset-x-0 bottom-0 bg-backgroundColor'>
-      <div className='text-center p-4 bg-gray-100 flex justify-center gap-10'>
+      <div className='text-center p-4 bg-gray-100 flex justify-around'>
         <FooterIcon href='/' text='ホーム' icon={IoHomeOutline} />
         <FooterIcon href='/signUp' text='作成' icon={IoCreateOutline} />
         <FooterIcon href='/user' text='ユーザー' icon={CiUser} />
