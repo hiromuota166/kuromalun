@@ -6,7 +6,7 @@ class PingRequest(BaseModel):
 
 app = FastAPI()
 
-@app.post("/Ping-Pong/")
+@app.post("/ping-pong/")
 async def ping_pong(request: PingRequest):
     if request.message == "Ping":
         return {"message": "Pong"}
