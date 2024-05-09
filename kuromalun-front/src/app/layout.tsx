@@ -19,7 +19,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="h-screen">
+    <html lang="en" className="relative">
       <body className={inter.className}>
         <ChakraProvider>
           <Header />
