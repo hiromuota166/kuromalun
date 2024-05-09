@@ -13,7 +13,7 @@ interface CircleInputTextProps {
 const CircleInputText = (props: CircleInputTextProps) => {
   const { icon, width, height, text, exampletext } = props;
   return (
-    <div className=''>
+    <div className='mb-4'>
       <CircleDetailTextItem icon={icon} width={width} height={height} text={text}/>
       <textarea 
         placeholder={exampletext}
