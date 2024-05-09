@@ -10,7 +10,10 @@ const LinkInItem = (props: LinkInItemProps) => {
   return (
     <div>
       <p>{text}</p>
-      <textarea placeholder={exampletext} />
+      <textarea 
+        placeholder={exampletext}
+        className="md:w-full"
+      />
   </div>
   )
 }

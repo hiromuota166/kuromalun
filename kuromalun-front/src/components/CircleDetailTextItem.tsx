@@ -14,7 +14,7 @@ const CircleDetailTextItem = (props: CircleDetailTextItemProps) => {
   return (
     <div className='flex'>
       <DefaultIcon icon={icon} width={width} height={height}/>
-      <p>{text}</p>
+      <p className='pl-4'>{text}</p>
     </div>
   )
 }
