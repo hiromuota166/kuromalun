@@ -7,7 +7,7 @@ import LinkInItem from '@/components/LinkInItem';
 
 const page = () => {
   return (
-    <div className=' md:flex md:h-[calc(100vh-156px)] mb-28'>
+    <div className=' md:flex md:h-[calc(100vh-156px)]'>
       {/* サークル名 */}
       <div className='relative md:w-1/2 flex items-center justify-center'>
         <div className='relative'>
