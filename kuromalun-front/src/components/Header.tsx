@@ -1,4 +1,5 @@
 'use client'
+import SettingIcon from './SettingIcon'
 
 const Header = () => {
   return (
@@ -8,7 +9,8 @@ const Header = () => {
           <a href="/" className=''>kuromalun</a>
         </h1>
       </div>
-      <div className="items-center flex p-4">
+      <div className="items-end flex p-4">
+        <SettingIcon />
       </div>
     </header>
   )
