@@ -18,13 +18,13 @@ const SettingTag= (props: SettingTagProps) => {
     <div>
       <Accordion allowToggle>
         <AccordionItem>
-          <h2 id="heading1">
-            <AccordionButton aria-expanded="false" aria-controls="panel1" className="justify-between">
+          <h2>
+            <AccordionButton aria-expanded="false" aria-controls="panel1" className="justify-between text-mainColor">
               {title}
               <AccordionIcon />
             </AccordionButton>
           </h2>
-          <AccordionPanel id="panel1" p={2} className="justify-between">
+          <AccordionPanel id="panel1" p={2} className="justify-between m-3 text-mainColor">
             {content}
           </AccordionPanel>
         </AccordionItem>
