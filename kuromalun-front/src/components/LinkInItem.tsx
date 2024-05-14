@@ -2,16 +2,16 @@
 
 interface LinkInItemProps {
   text: string;
-  exampletext: string;
+  exampleText: string;
 }
 
 const LinkInItem = (props: LinkInItemProps) => {
-  const { text, exampletext } = props;
+  const { text, exampleText } = props;
   return (
     <div>
       <p>{text}</p>
       <textarea 
-        placeholder={exampletext}
+        placeholder={exampleText}
         className="md:w-full"
       />
   </div>
