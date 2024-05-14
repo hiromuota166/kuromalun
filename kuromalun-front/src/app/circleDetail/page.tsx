@@ -7,10 +7,10 @@ import CircleImageTop from '@/components/CircleImageTop';
 
 const page = () => {
   return (
-    <div className=' md:flex md:h-[calc(100vh-156px)]'>
+    <div className=' md:flex md:h-[calc(100vh-156px)] mb-24'>
       {/* サークル名 */}
       <div className='relative md:w-1/2 flex items-center justify-center'>
-        <CircleImageTop />
+        <CircleImageTop src="/haikei.png" text="watnow"/>
       </div>
       {/* 内容 */}
       <div className='bg-mainColor md:w-1/2 m-4 flex-col overflow-y-auto'>
