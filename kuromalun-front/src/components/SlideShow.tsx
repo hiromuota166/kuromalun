@@ -10,7 +10,8 @@ import { Autoplay, Pagination, Navigation } from 'swiper/modules';
 const testList = [
   { src: '/haikei.png', alt: 'slide-1' },
   { src: '/tennisCircle.JPG', alt: 'slide-2' },
-  { src: '/watnow.JPG', alt: 'slide-3' }
+  { src: '/watnow.JPG', alt: 'slide-3' },
+  { src: '/hackathon.PNG', alt: 'slide-' },
 ];
 
 export default function App() {

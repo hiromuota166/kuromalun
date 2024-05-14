@@ -1,5 +1,4 @@
 'use client'
-import { Icon } from '@chakra-ui/icons';
 import { IoHomeOutline, IoCreateOutline } from "react-icons/io5";
 import { CiUser } from "react-icons/ci";
 import FooterIcon from './FooterIcon';
