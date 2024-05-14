@@ -1,36 +1,16 @@
 'use client'
-import Image from 'next/image'
 import { IoClipboardSharp, IoLocationSharp, IoTime, IoPeopleSharp, IoLink} from "react-icons/io5";
 import CircleDetailTextItem from '@/components/CircleDetailTextItem';
 import CircleInputText from '@/components/CircleInputText';
 import LinkInItem from '@/components/LinkInItem';
+import CircleImageTop from '@/components/CircleImageTop';
 
 const page = () => {
   return (
     <div className=' md:flex md:h-[calc(100vh-156px)]'>
       {/* サークル名 */}
       <div className='relative md:w-1/2 flex items-center justify-center'>
-        <div className='relative'>
-          <Image
-            src='/haikei.png'
-            alt='サークル画像'
-            width={1200}
-            height={900}
-            sizes='(max-width: 768px) 100vw, 33vw'
-          />
-          <div className='absolute bottom-4 left-4'>
-            <Image
-              src='/iconGreen.png'
-              alt='ユーザー画像'
-              width={40}
-              height={40}
-              className='rounded-xl mb-2'
-            />
-            <h1 className='text-2xl'>
-              <input type='text' placeholder='サークル名' className='bg-backgroundColor/0'/>
-            </h1>
-          </div>
-        </div>
+        <CircleImageTop />
       </div>
       {/* 内容 */}
       <div className='bg-mainColor md:w-1/2 m-4 flex-col overflow-y-auto'>

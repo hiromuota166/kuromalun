@@ -1,13 +1,19 @@
 import React from 'react'
 import Image from 'next/image'
 
-const CircleImageTop = () => {
+interface CircleImageTopProps {
+  src: string
+  text: string
+}
+
+const CircleImageTop = (props: CircleImageTopProps) => {
+  const { src, text } = props
   return (
     <>
       <div className='relative'>
         <div>
           <Image
-            src='/haikei.png'
+            src={src}
             alt='サークル画像'
             width={1200}
             height={900}
@@ -15,15 +21,8 @@ const CircleImageTop = () => {
           />
         </div>
         <div className='absolute bottom-4 left-4'>
-          <Image
-            src='/iconGreen.png'
-            alt='ユーザー画像'
-            width={40}
-            height={40}
-            className='rounded-xl mb-2'
-          />
           <h1 className='text-2xl'>
-            watnow
+            {text}
           </h1>
         </div>
       </div>
