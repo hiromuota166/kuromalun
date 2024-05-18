@@ -22,6 +22,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ChakraProvider>
           <Navigation />
+          <div className="h-14"></div>
           {children}
         </ChakraProvider>
       </body>

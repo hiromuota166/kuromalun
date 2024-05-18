@@ -12,7 +12,7 @@ const Navigation: React.FC = () => {
 
   return (
     <div>
-      <nav className='flex justify-between items-center border-b'>
+      <nav className='fixed z-50 bg-mainColor w-full flex justify-between items-center'>
         <ul className='items-center flex'>
           <li className='justify-center'>
             <a href="/" className={getLinkClasses('/')}>ホーム</a>
