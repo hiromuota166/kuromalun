@@ -2,7 +2,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <div className='h-[calc(100vh-156px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
+    <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
       <p className='text-4xl font-bold '>Log in</p>
       </div>
