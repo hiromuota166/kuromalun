@@ -15,7 +15,7 @@ const CircleDetailText = (props: CircleDetailTextProps) => {
   return (
     <div className='mb-4'>
       <CircleDetailTextItem icon={icon} width={width} height={height} text={text}/>
-      <p className='w-full md:h-90vh border-backgroundColor border rounded-xl p-2 mt-2'>
+      <p className='w-full md:h-90vh border-mainColor border rounded-xl p-2 mt-2'>
         {exampleText}
       </p>
     </div>
