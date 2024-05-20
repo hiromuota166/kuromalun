@@ -13,7 +13,7 @@ const page = () => {
           </div>
           <input 
             placeholder={""}
-            className='w-full h-16 rounded-xl p-2 mt-2 bg-color'
+            className='w-full h-16 rounded-xl p-2 mt-2 border-2'
           />
         </div>
         <div className='w-4/5 mt-5'>
@@ -22,11 +22,11 @@ const page = () => {
           </div>
           <input 
             placeholder={""}
-            className='w-full h-16 rounded-xl p-2 mt-2 bg-color'
+            className='w-full h-16 rounded-xl p-2 mt-2 border-2'
             type='password'
           />
         </div>
-        <button type='submit' className='w-4/5 h-16 p-3 mt-10 text-white font-bold rounded-lg shadow-lg bg-emphasisColor hover:bg-mainColor hover:text-emphasisColor transition duration-150 active:scale-90'>
+        <button type='submit' className='w-4/5 h-16 p-3 mt-10 text-white font-bold rounded-lg shadow-lg bg-emphasisColor hover:bg-backgroundColor hover:text-emphasisColor transition duration-150 active:scale-90'>
           ログイン
         </button>
         <a href='/signUp' className='mt-6 mb-10' >
