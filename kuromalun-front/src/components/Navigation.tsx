@@ -22,8 +22,7 @@ const Navigation: React.FC = () => {
             <a href="/circleCreateEdit" className={getLinkClasses('/circleCreateEdit')}>作成</a>
           </li>
         </ul>
-        <ul className='items-center'>
-          <SettingIcon/>
+        <ul className=''>
           <UserIcon/>
         </ul>
       </nav>
