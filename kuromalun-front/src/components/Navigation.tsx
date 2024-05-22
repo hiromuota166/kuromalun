@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import SettingIcon from './SettingIcon'
 import UserIcon from './UserIcon'
 
 const Navigation: React.FC = () => {
@@ -22,6 +23,7 @@ const Navigation: React.FC = () => {
           </li>
         </ul>
         <ul className='items-center'>
+          <SettingIcon/>
           <UserIcon/>
         </ul>
       </nav>
