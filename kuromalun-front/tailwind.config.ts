@@ -15,8 +15,8 @@ const config: Config = {
       },
     },
     colors: {
-      backgroundColor: "#000000",
-      mainColor: "#ffffff",
+      backgroundColor: "#ffffff",
+      mainColor: "#000000",
       color: "#9F9F9F",
       emphasisColor: "#FEB06A",
     },

@@ -13,7 +13,7 @@ const page = () => {
         <CircleImageTop src="/haikei.png" text="watnow"/>
       </div>
       {/* 内容 */}
-      <div className='bg-mainColor md:w-1/2 m-4 flex-col overflow-y-auto'>
+      <div className='bg-backgroundColor md:w-1/2 m-4 flex-col overflow-y-auto'>
         <CircleDetailText icon={IoClipboardSharp} width={6} height={6} text='活動内容' exampleText='イベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさんイベントたくさん！' />
         <CircleDetailText icon={IoLocationSharp} width={6} height={6} text='活動場所' exampleText='OIC屋上' />
         <CircleDetailText icon={IoTime} width={6} height={6} text='活動時間' exampleText='放課後' />
