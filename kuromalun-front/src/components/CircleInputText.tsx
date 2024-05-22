@@ -17,7 +17,7 @@ const CircleInputText = (props: CircleInputTextProps) => {
       <CircleDetailTextItem icon={icon} width={width} height={height} text={text}/>
       <textarea 
         placeholder={exampleText}
-        className='w-full md:h-90vh border-backgroundColor border rounded-xl p-2 mt-2'
+        className='w-full md:h-90vh border-mainColor border rounded-xl p-2 mt-2'
       />
     </div>
   )
