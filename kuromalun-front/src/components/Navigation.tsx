@@ -13,7 +13,7 @@ const Navigation: React.FC = () => {
 
   return (
     <div>
-      <nav className='fixed z-50 bg-mainColor w-full flex justify-between items-center'>
+      <nav className='fixed z-50 bg-backgroundColor w-full flex justify-between items-center'>
         <ul className='items-center flex'>
           <li className='justify-center'>
             <a href="/" className={getLinkClasses('/')}>ホーム</a>
