@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { usePathname } from 'next/navigation'
+import SettingIcon from './SettingIcon'
 import UserIcon from './UserIcon'
 
 const Navigation: React.FC = () => {
@@ -21,7 +22,7 @@ const Navigation: React.FC = () => {
             <a href="/circleCreateEdit" className={getLinkClasses('/circleCreateEdit')}>作成</a>
           </li>
         </ul>
-        <ul className='items-center'>
+        <ul className=''>
           <UserIcon/>
         </ul>
       </nav>
