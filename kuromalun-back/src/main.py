@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
 import jwt
 from uuid import uuid4
-from modules import DB_mosule, OAuth_module
+from modules import DB_mosule, OAuth_module, supabase_module
 
 # FastAPIアプリケーションのインスタンス化
 app = FastAPI()
@@ -11,8 +11,8 @@ app = FastAPI()
 # OAuth2PasswordBearerオブジェクトを作成し、トークン取得用のエンドポイントを設定
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-# トークン発行用のエンドポイント
-@app.post("/token")
+# redisトークン発行用のエンドポイント
+@app.post("/make-token")
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = OAuth_module.authenticate_user(form_data.username, form_data.password)
     if not user:
@@ -25,6 +25,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     access_token = jwt.encode({"sub": form_data.username}, OAuth_module.SECRET_KEY, algorithm=OAuth_module.ALGORITHM)
     return {"access_token": access_token, "token_type": "bearer"}
 
+
 # プロテクトされたエンドポイント
 @app.get("/protected")
 async def protected_route(token: str = Depends(oauth2_scheme)):
@@ -33,10 +34,11 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
     # ここでユーザ名を使って何かしらの処理を行う
     return {"message": f"Hello, {username}. You are authorized"}
 
+
 #新規ユーザ登録
-@app.post("/new-user/")
-async def create_user(user: DB_mosule.UserCreate):
-    DB_mosule.save_user(user)
+@app.post("/create-new-users/")
+async def create_user(user: supabase_module.UserCreate):
+    supabase_module.save_user(user)
     send_confirmation_email(user.email)
 
 def send_confirmation_email(email: str):

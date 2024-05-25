@@ -1,14 +1,17 @@
+from supabase import create_client, Client
 from fastapi import FastAPI, HTTPException, Depends, Form
 from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
 from uuid import uuid4
-from passlib.context import CryptContext
-import redis
-import re
-from modules import OAuth_module
+import os
+from dotenv import load_dotenv, find_dotenv
 import hashlib
 
+load_dotenv(find_dotenv())
 
-redis_client = redis.Redis(host='localhost', port=6379, db=0)
+
+url: str = os.getenv("SUPABASE_URL")
+key: str = os.getenv("SUPABASE_KEY")
+supabase: Client = create_client(url, key)
 
 # ユーザーモデル
 class User(BaseModel):
@@ -25,13 +28,13 @@ class UserCreate(BaseModel):
     email: EmailStr = Field(..., description="メールアドレス")
     password: SecretStr = Field(..., description="パスワード")
 
-   
-
 def save_user(user_request):
     # ユーザーIDとメールアドレスの一意性を確認
-    if redis_client.hexists(f"user:{user_request.userId}", "uid"):
+    data, count = supabase.table("users").select('userId').eq("userId", user_request.userId).execute()
+    if len(data[1]) != 0:
         raise HTTPException(status_code=400, detail="User ID already exists")
-    if redis_client.hexists(f"user:{user_request.email}", "uid"):
+    data, count = supabase.table("users").select('email').eq("email", user_request.email).execute()
+    if len(data[1]) != 0:
         raise HTTPException(status_code=400, detail="Email already exists")
     
     hashed_password = hashlib.sha256(user_request.password.get_secret_value().encode('utf-8')).hexdigest()
@@ -47,30 +50,22 @@ def save_user(user_request):
         password=hashed_password
     )
 
-    # Redisに保存
-    user_key = f"user:{new_user.uid}"
-    redis_client.hset(user_key, "uid", new_user.uid)
-    redis_client.hset(user_key, "userId", new_user.userId)
-    redis_client.hset(user_key, "displayName", new_user.displayName)
-    redis_client.hset(user_key, "email", new_user.email)
-    redis_client.hset(user_key, "password", new_user.password.get_secret_value())
+    # supabaseに保存
 
-    user_key_email = f"user:{new_user.email}"
-    redis_client.hset(user_key_email, "uid", new_user.uid)
-
-    user_key_userId = f"user:{new_user.userId}"
-    redis_client.hset(user_key_userId, "uid", new_user.uid)
+    data, count = supabase.table('users').insert({"userId": new_user.userId, "displayName": new_user.displayName, "email": new_user.email, "password":  new_user.password.get_secret_value()}).execute()
 
     return {"message": "User created successfully", "user": new_user}
 
 def get_user_login(user_email):
-    if redis_client.hexists(f"user:{user_email}", "uid"):
-        uid = redis_client.hget(f"user:{user_email}", "uid")
-        user_key = f"user:{uid.decode('utf-8')}"
-        userId = redis_client.hget(user_key, "userId").decode('utf-8')
-        displayName = redis_client.hget(user_key, "displayName").decode('utf-8')
-        email = redis_client.hget(user_key, "email").decode('utf-8')
-        password = redis_client.hget(user_key, "password")
+    data, count = supabase.table("users").select('*').eq("email", user_email).execute()
+    if len(data[1]) == 0:
+        raise HTTPException(status_code=400, detail="No account")
+    else:
+        uid = data[1][0]['uid']
+        userId = data[1][0]['userId']
+        displayName = data[1][0]['displayName']
+        email = data[1][0]['email']
+        password = data[1][0]['password']
         user = User(
             uid=uid,
             userId=userId,
@@ -79,4 +74,3 @@ def get_user_login(user_email):
             password=password
         )
         return user
-    raise HTTPException(status_code=400, detail="No account")

@@ -1,13 +1,17 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from passlib.context import CryptContext
-import redis
+from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
 import jwt
-from modules import DB_mosule
+from modules import supabase_module
 import hashlib
+import os
+from dotenv import load_dotenv, find_dotenv
+
+load_dotenv(find_dotenv())
 
 # シークレットキー（トークンの署名に使用）
-SECRET_KEY = "your_secret_key"
+SECRET_KEY = os.getenv("SECRET_KEY_TOKEN")
 ALGORITHM = "HS256"
 # パスワードハッシュ化の設定
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -25,9 +29,11 @@ def verify_token(token: str):
     
     # 認証用の関数
 def authenticate_user(username: str, password: str):
-    user =  DB_mosule.get_user_login(username)
+    password = SecretStr(password)
+    user =  supabase_module.get_user_login(username)
+    hashed_password = hashlib.sha256(password.get_secret_value().encode('utf-8')).hexdigest()
     if not user:
         return False
-    if not pwd_context.verify(password, user.password):
+    if  hashed_password != user.password.get_secret_value():
         return False
     return user
