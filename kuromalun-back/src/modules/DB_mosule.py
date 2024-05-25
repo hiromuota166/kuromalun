@@ -29,9 +29,9 @@ class UserCreate(BaseModel):
 
 def save_user(user_request):
     # ユーザーIDとメールアドレスの一意性を確認
-    if redis_client.hexists(f"user:{user_request.userId}", "userId"):
+    if redis_client.hexists(f"user:{user_request.userId}", "uid"):
         raise HTTPException(status_code=400, detail="User ID already exists")
-    if redis_client.hexists(f"user:{user_request.email}", "email"):
+    if redis_client.hexists(f"user:{user_request.email}", "uid"):
         raise HTTPException(status_code=400, detail="Email already exists")
     
     hashed_password = hashlib.sha256(user_request.password.get_secret_value().encode('utf-8')).hexdigest()
@@ -49,8 +49,6 @@ def save_user(user_request):
 
     # Redisに保存
     user_key = f"user:{new_user.uid}"
-
-    #redis_client.hset(user_key, mapping={"uid": new_user.uid,"userId": new_user.userId,"displayName": new_user.displayName,"email": new_user.email,"password": new_user.password.get_secret_value()})
     redis_client.hset(user_key, "uid", new_user.uid)
     redis_client.hset(user_key, "userId", new_user.userId)
     redis_client.hset(user_key, "displayName", new_user.displayName)
