@@ -1,7 +1,7 @@
 from fastapi import  HTTPException, status
 from pydantic import  SecretStr
 import jwt
-from modules import supabase_module
+from mymodules import supabase_module
 import hashlib
 import os
 from dotenv import load_dotenv, find_dotenv
