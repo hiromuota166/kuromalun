@@ -1,9 +1,7 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
 import jwt
-from uuid import uuid4
-from modules import DB_mosule, OAuth_module, supabase_module
+from modules import  OAuth_module, supabase_module
 
 # FastAPIアプリケーションのインスタンス化
 app = FastAPI()

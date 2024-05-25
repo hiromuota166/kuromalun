@@ -1,7 +1,5 @@
-from fastapi import FastAPI, HTTPException, Depends, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
-from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
+from fastapi import  HTTPException, status
+from pydantic import  SecretStr
 import jwt
 from modules import supabase_module
 import hashlib

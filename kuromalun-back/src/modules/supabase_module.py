@@ -1,6 +1,6 @@
 from supabase import create_client, Client
-from fastapi import FastAPI, HTTPException, Depends, Form
-from pydantic import BaseModel, EmailStr, field_validator, SecretStr, Field
+from fastapi import  HTTPException
+from pydantic import BaseModel, EmailStr,  SecretStr, Field
 from uuid import uuid4
 import os
 from dotenv import load_dotenv, find_dotenv
