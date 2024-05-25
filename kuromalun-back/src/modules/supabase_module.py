@@ -28,6 +28,7 @@ class UserCreate(BaseModel):
     email: EmailStr = Field(..., description="メールアドレス")
     password: SecretStr = Field(..., description="パスワード")
 
+
 def save_user(user_request):
     # ユーザーIDとメールアドレスの一意性を確認
     data, count = supabase.table("users").select('userId').eq("userId", user_request.userId).execute()
@@ -58,6 +59,61 @@ def save_user(user_request):
 
 def get_user_login(user_email):
     data, count = supabase.table("users").select('*').eq("email", user_email).execute()
+    if len(data[1]) == 0:
+        raise HTTPException(status_code=400, detail="No account")
+    else:
+        uid = data[1][0]['uid']
+        userId = data[1][0]['userId']
+        displayName = data[1][0]['displayName']
+        email = data[1][0]['email']
+        password = data[1][0]['password']
+        user = User(
+            uid=uid,
+            userId=userId,
+            displayName=displayName,
+            email=email,
+            password=password
+        )
+        return user
+    
+##############################################################################
+#テスト用コード 
+class TestUserCreate(BaseModel):
+    displayName: str = Field(..., description="表示名")
+    email: EmailStr = Field(..., description="メールアドレス")
+    password: SecretStr = Field(..., description="パスワード")
+
+def test_save_user(user_request):
+    # メールアドレスの一意性を確認
+    data, count = supabase.table("test_users").select('email').eq("email", user_request.email).execute()
+    if len(data[1]) != 0:
+        raise HTTPException(status_code=400, detail="Email already exists")
+    
+    hashed_password = hashlib.sha256(user_request.password.get_secret_value().encode('utf-8')).hexdigest()
+    # 新規ユーザーのUIDを生成
+    uuid = str(uuid4())
+    userId = str(uuid4())
+
+    # ユーザーオブジェクトを作成
+    new_user = User(
+        uid=uuid,
+        userId=userId,
+        displayName=user_request.displayName,
+        email=user_request.email,
+        password=hashed_password
+    )
+
+    # supabaseに保存
+
+    data, count = supabase.table('test_users').insert({"userId": new_user.userId, "displayName": new_user.displayName, "email": new_user.email, "password":  new_user.password.get_secret_value()}).execute()
+    data, count = supabase.table("test_users").select('*').eq("email", user_request.email).execute()
+    new_user.uid = data[1][0]['uid']
+    new_user.userId = data[1][0]['userId']
+
+    return {"message": "User created successfully", "user": new_user}
+
+def test_get_user_login(user_email):
+    data, count = supabase.table("test_users").select('*').eq("email", user_email).execute()
     if len(data[1]) == 0:
         raise HTTPException(status_code=400, detail="No account")
     else:
