@@ -4,7 +4,7 @@ import jwt
 import hashlib
 import sys
 sys.path.append("~/src")
-import supabase_module
+from . import supabase_module
 import os
 from dotenv import load_dotenv, find_dotenv
 
