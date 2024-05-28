@@ -1,6 +1,8 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
+import sys
+sys.path.append("~/src")
 from mymodules import  OAuth_module, supabase_module
 
 # FastAPIアプリケーションのインスタンス化
