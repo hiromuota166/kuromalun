@@ -51,14 +51,3 @@ def test_authenticate_user(username: str, password: str):
     if  hashed_password != user.password.get_secret_value():
         return False
     return user
-
-# 認証用の関数
-def authenticate_user(username: str, password: str):
-    password = SecretStr(password)
-    user =  supabase_module.test_get_user_login(username)
-    hashed_password = hashlib.sha256(password.get_secret_value().encode('utf-8')).hexdigest()
-    if not user:
-        return False
-    if  hashed_password != user.password.get_secret_value():
-        return False
-    return user
