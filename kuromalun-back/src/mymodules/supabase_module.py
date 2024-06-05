@@ -1,6 +1,6 @@
 from supabase import create_client, Client
 from fastapi import  HTTPException
-from pydantic import BaseModel, EmailStr,  SecretStr, Field
+from pydantic import BaseModel, EmailStr,  SecretStr, Field, List, HttpUrl
 from uuid import uuid4
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -21,6 +21,16 @@ class User(BaseModel):
     email: EmailStr
     password: SecretStr
 
+#サークルモデル
+class Circle(BaseModel):
+    uid: str
+    ownerId: str
+    name: str
+    place: str
+    time: str
+    size: str
+    link: List[HttpUrl]
+
 # ユーザーの入力データ用モデル
 class UserCreate(BaseModel):
     userId: str = Field(..., description="ユーザーが任意で設定できる一意なID")
@@ -28,6 +38,13 @@ class UserCreate(BaseModel):
     email: EmailStr = Field(..., description="メールアドレス")
     password: SecretStr = Field(..., description="パスワード")
 
+#サークル入力データ用モデル
+class CircleCreate(BaseModel):
+    name: str = Field(..., description="サークルの名前")
+    place: str = Field(..., description="サークルの活動場所")
+    time: str = Field(..., description="サークルの活動時間")
+    size: str = Field(..., description="サークルの所属人数")
+    link: List[HttpUrl] = Field(..., description="サークルのSNS等のURL")
 
 def save_user(user_request):
     # ユーザーIDとメールアドレスの一意性を確認
@@ -75,7 +92,15 @@ def get_user_login(user_email):
             password=password
         )
         return user
-    
+#メールアドレスからuidを取得する関数
+def get_uid_from_email(mail):
+    uid = supabase.table('users').select("uid").eq("email", mail).execute()
+    return uid
+
+#サークルデータを保存する関数
+def save_circle(new_circle, user_uid):
+    data, count = supabase.table('circles').insert({"ownerId": user_uid, "name": new_circle.name, "place": new_circle.place, "time":  new_circle.time, "size":  new_circle.size, "link": new_circle.link}).execute()
+    return {"message": "Circle created successfully", "circle": new_circle.name}
 ##############################################################################
 #テスト用コード 
 class TestUserCreate(BaseModel):
@@ -130,3 +155,8 @@ def test_get_user_login(user_email):
             password=password
         )
         return user
+    
+#メールアドレスからuidを取得する関数
+def test_get_uid_from_email(mail):
+    uid = supabase.table('test_users').select("uid").eq("email", mail).execute()
+    return uid
