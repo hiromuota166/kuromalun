@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
 import sys
 sys.path.append("~/src")
-from .mymodules import  OAuth_module, supabase_module
+from mymodules import  OAuth_module, supabase_module
 from pydantic import BaseModel
 # FastAPIアプリケーションのインスタンス化
 app = FastAPI()
@@ -94,8 +94,6 @@ async def protected_route(new_circle: supabase_module.CircleCreate, token: str =
 ##################--PingPong--#####################
 class PingRequest(BaseModel):
     message: str
-
-app = FastAPI()
 
 @app.post("/test/ping-pong/")
 async def ping_pong(request: PingRequest):
