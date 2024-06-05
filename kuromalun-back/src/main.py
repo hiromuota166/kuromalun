@@ -84,8 +84,6 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
 class PingRequest(BaseModel):
     message: str
 
-app = FastAPI()
-
 @app.post("/test/ping-pong/")
 async def ping_pong(request: PingRequest):
     if request.message == "Ping":
