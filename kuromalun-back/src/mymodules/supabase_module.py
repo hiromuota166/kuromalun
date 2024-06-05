@@ -1,6 +1,6 @@
 from supabase import create_client, Client
 from fastapi import  HTTPException
-from pydantic import BaseModel, EmailStr,  SecretStr, Field, List, HttpUrl
+from pydantic import BaseModel, EmailStr,  SecretStr, Field, list, HttpUrl
 from uuid import uuid4
 import os
 from dotenv import load_dotenv, find_dotenv
@@ -29,7 +29,7 @@ class Circle(BaseModel):
     place: str
     time: str
     size: str
-    link: List[HttpUrl]
+    link: list[HttpUrl]
 
 # ユーザーの入力データ用モデル
 class UserCreate(BaseModel):
