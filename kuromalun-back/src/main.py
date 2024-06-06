@@ -88,6 +88,7 @@ async def protected_route(new_circle: supabase_module.CircleCreate, token: str =
     username = OAuth_module.verify_token(token)
     # mailからuid取得
     uid = supabase_module.test_get_uid_from_email(username)
+    return {"message": f"Hello, {username}. You are authorized"}
     supabase_module.save_circle(new_circle, uid)
     return {"message": f"Hello, {username}. You are authorized"}
 
