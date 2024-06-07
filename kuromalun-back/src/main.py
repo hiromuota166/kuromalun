@@ -45,7 +45,21 @@ def send_confirmation_email(email: str):
     # 実際のメール送信の実装をここに追加
     print(f"Confirmation email sent to {email}")
 
+#サークル登録
+@app.post("/make-circle")
+async def protected_route(new_circle: supabase_module.CircleCreate, token: str = Depends(oauth2_scheme)):
+    # トークンを検証し、ユーザ名を取得する
+    username = OAuth_module.verify_token(token)
+    # mailからuid取得
+    uid = supabase_module.test_get_uid_from_email(username)
+    new_circle.ownerId = uid
+    supabase_module.save_circle(new_circle)
+    return {"message": f"Save {new_circle.name} successful"}
 
+@app.get("/get-circle-data")
+async def get_circle_data_route():
+    circles = supabase_module.get_circle_data()
+    return {"message": f"{circles}"}
 ####################################################################3
 #テスト用コード
 #新規ユーザ登録
@@ -79,17 +93,6 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
     # トークンを検証し、ユーザ名を取得する
     username = OAuth_module.verify_token(token)
     # ここでユーザ名を使って何かしらの処理を行う
-    return {"message": f"Hello, {username}. You are authorized"}
-
-#サークル登録
-@app.post("/make-circle")
-async def protected_route(new_circle: supabase_module.CircleCreate, token: str = Depends(oauth2_scheme)):
-    # トークンを検証し、ユーザ名を取得する
-    username = OAuth_module.verify_token(token)
-    # mailからuid取得
-    uid = supabase_module.test_get_uid_from_email(username)
-    return {"message": f"Hello, {username}. You are authorized"}
-    supabase_module.save_circle(new_circle, uid)
     return {"message": f"Hello, {username}. You are authorized"}
 
 ##################--PingPong--#####################

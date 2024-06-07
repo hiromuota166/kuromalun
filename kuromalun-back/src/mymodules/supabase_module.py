@@ -2,7 +2,7 @@ from supabase import create_client, Client
 from fastapi import  HTTPException
 from pydantic import BaseModel, EmailStr,  SecretStr, Field, HttpUrl
 from typing import List
-from uuid import uuid4
+from uuid import uuid4, UUID
 import os
 from dotenv import load_dotenv, find_dotenv
 import hashlib
@@ -41,6 +41,7 @@ class UserCreate(BaseModel):
 
 #サークル入力データ用モデル
 class CircleCreate(BaseModel):
+    ownerId: str = Field(..., description="サークルの作成者")
     name: str = Field(..., description="サークルの名前")
     place: str = Field(..., description="サークルの活動場所")
     time: str = Field(..., description="サークルの活動時間")
@@ -95,13 +96,32 @@ def get_user_login(user_email):
         return user
 #メールアドレスからuidを取得する関数
 def get_uid_from_email(mail):
-    uid = supabase.table('users').select("uid").eq("email", mail).execute()
+    data, count = supabase.table('users').select("uid").eq("email", mail).execute()
+    uid = data[1][0]['uid']
     return uid
 
 #サークルデータを保存する関数
-def save_circle(new_circle, user_uid):
-    data, count = supabase.table('circles').insert({"ownerId": user_uid, "name": new_circle.name, "place": new_circle.place, "time":  new_circle.time, "size":  new_circle.size, "link": new_circle.link}).execute()
-    return {"message": "Circle created successfully", "circle": new_circle.name}
+def save_circle(new_circle):
+    for i in range(len(new_circle.link)):
+        new_circle.link[i] = str(new_circle.link)
+    #サークルデータを保存
+    data, count = supabase.table('circles').insert({"ownerId": new_circle.ownerId, "name": new_circle.name, "place": new_circle.place, "time": new_circle.time, "size": new_circle.size, "link": new_circle.link}).execute()
+    #サークルリストに保存
+    resp = supabase.table('circle_list').insert({"uid": data[1][0]['uid']}).execute()
+
+#サークルデータを取得する関数
+def get_circle_data():
+    data, count = supabase.table('circle_list').select("uid").execute()
+    uid_list = []
+    data_list = []
+    for i in data[1]:
+        uid_list.append(i['uid'])
+    for i in uid_list:
+        data, count = supabase.table('circles').select("*").eq("uid", i).execute()
+        data_list.append(data)
+    print(data_list)
+    return data_list
+
 ##############################################################################
 #テスト用コード 
 class TestUserCreate(BaseModel):
@@ -159,5 +179,6 @@ def test_get_user_login(user_email):
     
 #メールアドレスからuidを取得する関数
 def test_get_uid_from_email(mail):
-    uid = supabase.table('test_users').select("uid").eq("email", mail).execute()
+    data, count = supabase.table('test_users').select("uid").eq("email", mail).execute()
+    uid = data[1][0]['uid']
     return uid
