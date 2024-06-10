@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException, Depends, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 import jwt
-from mymodules import  OAuth_module, supabase_module
-
+import sys
+sys.path.append("~/src")
+from .mymodules import  OAuth_module, supabase_module
+from pydantic import BaseModel
 # FastAPIアプリケーションのインスタンス化
 app = FastAPI()
 
@@ -77,3 +79,14 @@ async def protected_route(token: str = Depends(oauth2_scheme)):
     username = OAuth_module.verify_token(token)
     # ここでユーザ名を使って何かしらの処理を行う
     return {"message": f"Hello, {username}. You are authorized"}
+
+##################--PingPong--#####################
+class PingRequest(BaseModel):
+    message: str
+
+@app.post("/test/ping-pong/")
+async def ping_pong(request: PingRequest):
+    if request.message == "Ping":
+        return {"message": "Pong"}
+    else:
+        raise HTTPException(status_code=400, detail="Invalid request")
