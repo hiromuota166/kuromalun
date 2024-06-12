@@ -1,3 +1,17 @@
-export default function ErrorPage() {
-  return <p>Sorry, something went wrong</p>
+'use client'
+
+import { useRouter } from 'next/router'
+
+const ErrorPage = () => {
+  const router = useRouter()
+  const { message } = router.query
+
+  return (
+    <main>
+      <h1>Error</h1>
+      <p>{message ? decodeURIComponent(message as string) : 'An unexpected error occurred.'}</p>
+    </main>
+  )
 }
+
+export default ErrorPage
