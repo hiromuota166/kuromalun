@@ -29,6 +29,7 @@ export async function signup(formData: FormData) {
   // サインアップエラーの場合
   if (signUpError) {
     console.error('SignUp Error:', signUpError)
+    console.log('SignUp Error:', signUpError)
     redirect(`/error?message=${encodeURIComponent(signUpError.message)}`)    // 「/error」はまだ作っていない。後で作る。
     return
   }
