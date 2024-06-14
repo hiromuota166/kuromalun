@@ -4,6 +4,12 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
+interface FormDataInputs {
+  email: string;
+  password: string;
+  displayName: string;
+}
+
 /**
  * サインアップとデータ挿入
  *
@@ -14,60 +20,52 @@ import { createClient } from '@/utils/supabase/server'
  * @returns void
  */
 export async function signup(formData: FormData) {
-  // ✅Supabaseクライアント
+  // Supabaseクライアント
   const supabase = createClient()
 
   // フォームからデータ取得
-  const data = {
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
+  const data = getFormData(formData)
+
+  if (!data) {
+    redirect('/error?message=Invalid form data')
+    return
   }
 
-  // ✅サインアップ
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp(data)
+  // サインアップ
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    email: data.email,
+    password: data.password,
+  })
 
   // サインアップエラーの場合
   if (signUpError) {
-    console.error('SignUp Error:', signUpError)
-    console.log('SignUp Error:', signUpError)
-    redirect(`/error?message=${encodeURIComponent(signUpError.message)}`)    // 「/error」はまだ作っていない。後で作る。
+    redirect(`/error?message=${encodeURIComponent(signUpError.message)}`)
     return
   }
 
   // サインアップが成功した場合
   if (signUpData?.user) {
     // データ挿入
-    const { insertError } = await insertData(formData, signUpData.user.id)
+    const { insertError } = await addUserData(data, signUpData.user.id)
 
     // データ挿入エラーの場合
     if (insertError) {
-      console.error('Insert Data Error:', insertError)
       redirect(`/error?message=${encodeURIComponent(insertError.message)}`)
       return
     }
   }
 
-  // トップページのlayoutを再検証
-  revalidatePath('/', 'layout')
-  // トップページへリダイレクト
-  redirect('/')
+  redirect('/circleCreateEdit')
 }
 
 /**
  * データ挿入
- * @param formData - フォームデータ
+ * @param inputs - フォームデータ
  * @param userId - サインアップしたユーザーのID
  */
-async function insertData(formData: FormData, userId: string) {
+async function addUserData(inputs: FormDataInputs, userId: string) {
   // Supabaseクライアントを作成
   const supabase = createClient()
-
-  // フォームから入力値を取得
-  const inputs = {
-    displayName: formData.get('displayName') as string,
-    email: formData.get('email') as string,
-    password: formData.get('password') as string,
-  }
 
   // データ挿入
   const { error } = await supabase
@@ -80,4 +78,25 @@ async function insertData(formData: FormData, userId: string) {
     })
 
   return { insertError: error }
+}
+
+/**
+ * フォームデータを取得し、型をチェックするヘルパー関数
+ * @param formData - フォームデータ
+ * @returns フォームデータのオブジェクトまたは null
+ */
+function getFormData(formData: FormData): FormDataInputs | null {
+  const email = formData.get('email')
+  const password = formData.get('password')
+  const displayName = formData.get('displayName')
+
+  if (typeof email === 'string' && typeof password === 'string' && typeof displayName === 'string') {
+    return {
+      email,
+      password,
+      displayName,
+    }
+  }
+
+  return null
 }
