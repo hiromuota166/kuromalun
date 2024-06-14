@@ -1,35 +1,52 @@
-import React from 'react'
+'use client'
+import React, { useState } from 'react'
+import { login } from './actions' // 作成したlogin関数をインポート
 
-const page = () => {
+const LoginPage = () => {
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
-      <p className='text-4xl font-bold '>Log in</p>
+        <p className='text-4xl font-bold'>Log in</p>
       </div>
-      <form className='w-full flex-1 flex flex-col items-center justify-start'>
+      <form className='w-full flex-1 flex flex-col items-center justify-start' action={login}>
         <div className='w-4/5'>
           <div className=''>
             <p className=''>メールアドレス</p>
           </div>
-          <input 
-            placeholder={""}
+          <input
+            placeholder={''}
             className='w-full h-16 rounded-xl p-2 mt-2 border-2'
+            type='email'
+            name='email'
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
         <div className='w-4/5 mt-5'>
           <div className=''>
             <p className=''>パスワード</p>
           </div>
-          <input 
-            placeholder={""}
+          <input
+            placeholder={''}
             className='w-full h-16 rounded-xl p-2 mt-2 border-2'
             type='password'
+            name='password'
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
-        <button type='submit' className='w-4/5 h-16 p-3 mt-10 text-white font-bold rounded-lg shadow-lg bg-emphasisColor hover:bg-backgroundColor hover:text-emphasisColor transition duration-150 active:scale-90'>
+        <button
+          type='submit'
+          className='w-4/5 h-16 p-3 mt-10 text-white font-bold rounded-lg shadow-lg bg-emphasisColor hover:bg-backgroundColor hover:text-emphasisColor transition duration-150 active:scale-90'
+        >
           ログイン
         </button>
-        <a href='/signUp' className='mt-6 mb-10' >
+        <a href='/signUp' className='mt-6 mb-10'>
           新規作成ページ
         </a>
       </form>
@@ -37,4 +54,4 @@ const page = () => {
   )
 }
 
-export default page
+export default LoginPage
