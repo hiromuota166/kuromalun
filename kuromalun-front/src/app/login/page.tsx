@@ -1,17 +1,31 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { handleLogin } from "../../components/Auth";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await handleLogin({ email, password, setIsLoading });
+    const isSuccess = await handleLogin({ email, password, setIsLoading });
+    if (isSuccess) {
+      router.push('/test');
+    }
   };
+
+  if (!isClient) {
+    return null; // クライアントサイドでのみレンダリング
+  }
 
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
