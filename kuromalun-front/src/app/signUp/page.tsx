@@ -1,22 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from 'react';
 import { handleSignUp } from "../../components/Auth";
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    await handleSignUp({ email, password, setIsLoading });
+    const isSuccess = await handleSignUp({ email, password, displayName, setIsLoading });
+    if (isSuccess) {
+      // Redirect or show success message
+    }
   };
 
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
-        <p className='text-4xl font-bold text-center'>Create New <br/> Account</p>
+        <p className='text-4xl font-bold '>Create New Account</p>
       </div>
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={onSubmit}>
         <div className='w-4/5'>
@@ -26,7 +30,8 @@ const SignUpPage = () => {
           <input 
             placeholder={""}
             className='w-full h-16 rounded-xl p-2 mt-2 border-2'
-            // ユーザー名は無視
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
           />
         </div>
         <div className='w-4/5 mt-5'>
