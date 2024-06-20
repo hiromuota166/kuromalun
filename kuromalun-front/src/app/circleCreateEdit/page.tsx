@@ -5,6 +5,7 @@ import { supabase } from '../../utils/supabase';
 
 const CircleCreateEditPage: React.FC = () => {
   const [name, setName] = useState("");
+  const [activity, setActivity] = useState("");
   const [place, setPlace] = useState("");
   const [time, setTime] = useState("");
   const [size, setSize] = useState("");
@@ -26,6 +27,7 @@ const CircleCreateEditPage: React.FC = () => {
 
     const newCircle = {
       name,
+      activity,
       place,
       time,
       size,
@@ -49,13 +51,24 @@ const CircleCreateEditPage: React.FC = () => {
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={handleSubmit}>
         <div className='w-4/5'>
           <div className=''>
+            <p className=''>サークル名</p>
+          </div>
+          <input
+            placeholder="ものづくりサークル"
+            className='w-full h-16 rounded-xl p-2 mt-2 border-2'
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+        </div>
+        <div className='w-4/5'>
+          <div className=''>
             <p className=''>活動内容</p>
           </div>
           <input
             placeholder="イベントたくさん！"
             className='w-full h-16 rounded-xl p-2 mt-2 border-2'
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+            value={activity}
+            onChange={(e) => setActivity(e.target.value)}
           />
         </div>
         <div className='w-4/5 mt-5'>
