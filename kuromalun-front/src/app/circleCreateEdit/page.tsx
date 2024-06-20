@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
+import { useRouter } from 'next/navigation';
 
 const CircleCreateEditPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -12,6 +13,7 @@ const CircleCreateEditPage: React.FC = () => {
   const [linkTitle, setLinkTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -40,6 +42,7 @@ const CircleCreateEditPage: React.FC = () => {
     if (error) {
       alert(`Error: ${error.message}`);
     } else {
+      router.push('/circleDetail');
       alert("データが保存されました");
     }
 
