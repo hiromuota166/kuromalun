@@ -1,47 +1,66 @@
-import Image from "next/image";
-import SlideShow from "@/components/SlideShow";
+"use client"
 
-export default function Home() {
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/utils/supabase';
+import { DetailModal } from '@/components/DetailModal';
+import { useDisclosure } from '@chakra-ui/hooks';
+
+interface Circle {
+  uid: string;
+  name: string;
+  circlesImageId: string;
+  activity?: string;
+  place?: string;
+  time?: string;
+  size?: string;
+  link?: string;
+}
+
+const Page = () => {
+  const [circles, setCircles] = useState<Circle[]>([]);
+  const [selectedCircle, setSelectedCircle] = useState<Circle | null>(null);
+  const { isOpen, onOpen, onClose } = useDisclosure();
+
+  // 画像と名前を全て取得し、ステートに保存
+  const listAllImage = async () => {
+    const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId, activity, place, time, size, link');
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (Array.isArray(data)) {
+      setCircles(data as Circle[]);
+    } else {
+      console.error('Unexpected data format:', data);
+    }
+  };
+
+  useEffect(() => {
+    listAllImage();
+  }, []);
+
+  const handleCircleClick = (circle: Circle) => {
+    setSelectedCircle(circle);
+    onOpen();
+  };
+
   return (
-    <div className="bg-backgroundColor">
-      <div className="bg-backgroundColor h-fit">
-        <SlideShow />
+    <div className="container mx-auto">
+      <h1 className="text-center text-2xl font-bold mb-4">サークル一覧</h1>
+      <div className="flex flex-wrap">
+        {circles.map(circle => (
+          <div key={circle.uid} className="w-1/4 p-2">
+            <div onClick={() => handleCircleClick(circle)} className="cursor-pointer">
+              <img src={circle.circlesImageId} alt={circle.name} className="w-full h-32 object-cover" />
+              <p className="text-center mt-2">{circle.name}</p>
+            </div>
+          </div>
+        ))}
       </div>
-      <div className="bg-backgroundColor h-fit p-4">
-        <div className="text-mainColor">
-          <h1 className="text-xl">大学公認部活動</h1>
-        </div>
-        <div className="w-full overflow-hidden">
-          <div className="flex space-x-4 overflow-x-scroll py-4">
-            <Image src="/hackathon.PNG" alt="背景を挿入"  className="rounded-lg flex-shrink-0" width={256} height={160} />
-            <Image src="/tennisCircle.JPG" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-          </div>
-        </div>
-        <div className="text-mainColor">
-          <h1 className="text-xl">大学公認同好会</h1>
-        </div>
-        <div className="w-full overflow-hidden">
-          <div className="flex space-x-4 overflow-x-scroll py-4">
-            <Image src="/hackathon.PNG" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/tennisCircle.JPG" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-          </div>
-        </div>
-        <div className="text-mainColor">
-          <h1 className="text-xl">大学非公認サークル</h1>
-        </div>
-        <div className="w-full overflow-hidden">
-          <div className="flex space-x-4 overflow-x-scroll py-4">
-            <Image src="/hackathon.PNG" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/tennisCircle.JPG" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-            <Image src="/haikei.png" alt="背景を挿入"  className="rounded-lg flex-shrink-0"  width={256} height={160} />
-          </div>
-        </div>
-      </div>
+      <DetailModal circle={selectedCircle} isOpen={isOpen} onClose={onClose} />
     </div>
   );
-}
+};
+
+export default Page;

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Image } from '@chakra-ui/react';
 import { Swiper, SwiperSlide } from 'swiper/react';
+import { supabase } from '../utils/supabase';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import 'swiper/css/navigation';
