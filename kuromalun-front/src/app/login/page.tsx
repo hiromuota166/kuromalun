@@ -17,7 +17,7 @@ const LoginPage = () => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const isSuccess = await handleLogin({ email, password, setIsLoading });
+    const isSuccess = await handleLogin({ email, password, setIsLoading, displayName: "" });
     if (isSuccess) {
       router.push('/test');
     }
