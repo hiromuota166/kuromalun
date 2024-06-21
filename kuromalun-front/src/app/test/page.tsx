@@ -12,7 +12,6 @@ interface Circle {
 
 const Page = () => {
   const [circles, setCircles] = useState<Circle[]>([]);
-
   // 画像と名前を全て取得し、ステートに保存
   const listAllImage = async () => {
     const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId');
