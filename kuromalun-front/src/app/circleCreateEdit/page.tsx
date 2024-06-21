@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
-import { useRouter } from 'next/navigation';
+import { v4 as uuidv4 } from 'uuid';
 
 const CircleCreateEditPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -13,7 +13,48 @@ const CircleCreateEditPage: React.FC = () => {
   const [linkTitle, setLinkTitle] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const router = useRouter();
+  const [image, setImage] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const public_url = "https://ntbxlozqezrwdpqphirl.supabase.co/storage/v1/object/public/circle-image/"
+
+  const handleChangeFile = (e: any) => {
+    if (e.target.files.length !== 0) {
+      const selectedFile = e.target.files[0]
+      setFile(selectedFile)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string)
+      }
+      reader.readAsDataURL(selectedFile)
+    }
+  }
+
+  const handleImageUpload = async () => {
+    if (!image) return "";
+
+    const fileExtension = image.name.split('.').pop();
+    const filePath = `img/${uuidv4()}.${fileExtension}`;
+    const { error: uploadError } = await supabase.storage
+      .from('public-image-bucket')
+      .upload(filePath, image);
+
+    if (uploadError) {
+      console.error("Image upload failed:", uploadError);
+      return "";
+    }
+
+    const { data } = supabase.storage
+      .from('public-image-bucket')
+      .getPublicUrl(filePath);
+
+    if (!data) {
+      console.error("Getting public URL failed");
+      return "";
+    }
+
+    return data.publicUrl;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -26,32 +67,65 @@ const CircleCreateEditPage: React.FC = () => {
       setIsLoading(false);
       return;
     }
+    if (file!!.type.match("image.*")) {
+      // 画像の拡張子を取得
+      const fileExtension = file!!.name.split(".").pop()
+      const filePath = `img/${uuidv4()}.${fileExtension}`
+      // 画像をアップロード
+      const { error: uploadError } = await supabase.storage
+        .from('circle-image')
+        .upload(filePath, file!!)
 
-    const newCircle = {
-      name,
-      activity,
-      place,
-      time,
-      size,
-      link: [{ title: linkTitle, url: linkUrl }],
-      ownerId: user.id,
-    };
+      // アップロードエラーがあればアラート表示
+      if (uploadError) {
+        alert("エラーが発生しました：" + uploadError.message)
+        return
+      }
+      const fileUrl = `${public_url}${filePath}`
 
-    const { error } = await supabase.from('circles').insert([newCircle]);
+      const newCircle = {
+        name,
+        activity,
+        place,
+        time,
+        size,
+        link: [{ title: linkTitle, url: linkUrl }],
+        ownerId: user.id,
+        circlesImageId: fileUrl,
+      };
+      
+      const { error: insertError } = await supabase.from('circles').insert([newCircle])
+      
+      // 挿入エラーがあればアラート表示
+      if (insertError) {
+        alert("エラーが発生しました：" + insertError.message)
+        return
+      }
 
-    if (error) {
-      alert(`Error: ${error.message}`);
+      // アップロードと挿入が成功したらファイルとプレビューをリセット
+      setFile(null)
+      setPreviewUrl(null)
     } else {
-      router.push('/circleDetail');
-      alert("データが保存されました");
+      // 画像ファイル以外はアラート表示
+      alert("画像ファイル以外はアップロード出来ません。")
     }
-
     setIsLoading(false);
   };
 
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={handleSubmit}>
+        <div className='w-4/5'>
+          <div className=''>
+            <p className=''>サークル画像</p>
+          </div>
+          <input
+            aria-label='サークル画像'
+            type='file'
+            className='w-full h-16 rounded-xl p-2 mt-2 border-2'
+            onChange={(e) => {handleChangeFile(e) }}
+          />
+        </div>
         <div className='w-4/5'>
           <div className=''>
             <p className=''>サークル名</p>
