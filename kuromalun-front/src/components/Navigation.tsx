@@ -60,7 +60,7 @@ const Navigation: React.FC = () => {
           </li>
         </ul>
         <ul className='flex items-center'>
-          {userEmail && <li className='mr-4'>{userEmail}</li>}
+          {/* {userEmail && <li className='mr-4'>{userEmail}</li>} */}
           <UserIcon />
         </ul>
       </nav>
