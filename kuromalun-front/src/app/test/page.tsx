@@ -1,37 +1,56 @@
-"use client";
+"use client"
 
-import { useEffect, useState } from 'react';
-import { supabase } from '../../utils/supabase';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '@/utils/supabase';
+import Link from 'next/link';
+
+interface Circle {
+  uid: string;
+  name: string;
+  circlesImageId: string;
+}
 
 const Page = () => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [circles, setCircles] = useState<Circle[]>([]);
+
+  // 画像と名前を全て取得し、ステートに保存
+  const listAllImage = async () => {
+    const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId');
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    if (Array.isArray(data)) {
+      const validatedData: Circle[] = data.filter((item): item is Circle => 
+        typeof item.uid === 'string' && 
+        typeof item.name === 'string' && 
+        typeof item.circlesImageId === 'string'
+      );
+      setCircles(validatedData);
+    } else {
+      console.error('Unexpected data format:', data);
+    }
+  };
 
   useEffect(() => {
-    const checkUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setIsLoggedIn(!!user);
-    };
-
-    checkUser();
-
-    // Supabaseのリスナーを設定して、ログイン状態の変化を監視する
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN') {
-        setIsLoggedIn(true);
-      } else if (event === 'SIGNED_OUT') {
-        setIsLoggedIn(false);
-      }
-    });
-
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    listAllImage();
   }, []);
 
   return (
-    <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
-      <div className='w-full h-[20vh] flex items-center justify-center'>
-        <p className='text-4xl font-bold '>{isLoggedIn ? 'ログイン済み' : '未ログイン'}</p>
+    <div className="container mx-auto">
+      <h1 className="text-center text-2xl font-bold mb-4">サークル一覧</h1>
+      <div className="flex flex-wrap">
+        {circles.map(circle => (
+          <div key={circle.uid} className="w-1/4 p-2">
+            <Link href={`/circleDetail/${circle.uid}`} legacyBehavior>
+              <a>
+                <img src={circle.circlesImageId} alt={circle.name} className="w-full h-32 object-cover" />
+                <p className="text-center mt-2">{circle.name}</p>
+              </a>
+            </Link>
+          </div>
+        ))}
       </div>
     </div>
   );
