@@ -12,39 +12,61 @@ const Page: React.FC = () => {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      const { data } = await supabase.auth.getUser();
+      const { data, error } = await supabase.auth.getUser();
       const user = data?.user;
 
-      if (user) {
-        setUserEmail(user.email ?? null);
-        // ユーザーのdisplayNameを取得
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('displayName')
-          .eq('userId', user.id)
-          .single();
+      if (!user) {
+        router.push('/login');
+        return;
+      }
 
-        if (userData) {
-          setDisplayName(userData.displayName ?? null);
-        }
+      setUserEmail(user.email ?? null);
 
-        // ユーザーが作成したサークルを取得
-        const { data: circleData, error: circleError } = await supabase
-          .from('circles')
-          .select('id, name')
-          .eq('ownerId', user.id);
+      // ユーザーのdisplayNameを取得
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('displayName')
+        .eq('userId', user.id)
+        .single();
 
-        if (circleData) {
-          setCircles(circleData);
-        }
+      if (userData) {
+        setDisplayName(userData.displayName ?? null);
+      }
+
+      // ユーザーが作成したサークルを取得
+      const { data: circleData, error: circleError } = await supabase
+        .from('circles')
+        .select('id, name')
+        .eq('ownerId', user.id);
+
+      if (circleData) {
+        setCircles(circleData);
       }
     };
 
     fetchUserData();
-  }, []);
+
+    // authStateChangeリスナーの設定
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        router.push('/');
+      }
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleCircleClick = (id: string) => {
     router.push(`/circleDetail/${id}`);
+  };
+
+  const handleLogout = async () => {
+    const confirmed = confirm('本当にログアウトしますか？');
+    if (confirmed) {
+      await supabase.auth.signOut();
+    }
   };
 
   return (
@@ -61,6 +83,12 @@ const Page: React.FC = () => {
             </li>
           ))}
         </ul>
+        <button
+          onClick={handleLogout}
+          className='mt-10 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700'
+        >
+          ログアウト
+        </button>
       </div>
     </div>
   );
