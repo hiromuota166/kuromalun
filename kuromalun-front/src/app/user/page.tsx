@@ -15,7 +15,11 @@ const Page: React.FC = () => {
       const { data, error } = await supabase.auth.getUser();
       const user = data?.user;
 
+      console.log('User data:', data);
+      console.log('User fetch error:', error);
+
       if (!user) {
+        console.log('No user found, redirecting to login...');
         router.push('/login');
         return;
       }
@@ -29,6 +33,9 @@ const Page: React.FC = () => {
         .eq('userId', user.id)
         .single();
 
+      console.log('User profile data:', userData);
+      console.log('User profile fetch error:', userError);
+
       if (userData) {
         setDisplayName(userData.displayName ?? null);
       }
@@ -36,8 +43,11 @@ const Page: React.FC = () => {
       // ユーザーが作成したサークルを取得
       const { data: circleData, error: circleError } = await supabase
         .from('circles')
-        .select('id, name')
+        .select('uid, name, circlesImageId')  // uidカラムを使用
         .eq('ownerId', user.id);
+
+      console.log('Circles data:', circleData);
+      console.log('Circles fetch error:', circleError);
 
       if (circleData) {
         setCircles(circleData);
@@ -48,7 +58,11 @@ const Page: React.FC = () => {
 
     // authStateChangeリスナーの設定
     const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state change event:', event);
+      console.log('Auth state change session:', session);
+
       if (event === 'SIGNED_OUT') {
+        console.log('User signed out, redirecting to home...');
         router.push('/');
       }
     });
@@ -58,14 +72,18 @@ const Page: React.FC = () => {
     };
   }, [router]);
 
-  const handleCircleClick = (id: string) => {
-    router.push(`/circleDetail/${id}`);
+  const handleCircleClick = (uid: string) => {
+    console.log('Circle clicked:', uid);
+    router.push(`/circleDetail/${uid}`);
   };
 
   const handleLogout = async () => {
     const confirmed = confirm('本当にログアウトしますか？');
     if (confirmed) {
+      console.log('User confirmed logout');
       await supabase.auth.signOut();
+    } else {
+      console.log('User canceled logout');
     }
   };
 
@@ -76,10 +94,11 @@ const Page: React.FC = () => {
       </div>
       <div className='w-full flex-1 flex flex-col items-center justify-start'>
         <h2 className='text-xl font-bold mt-10'>作成したサークル</h2>
-        <ul className='w-4/5 mt-5'>
+        <ul className='w-4/5 mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
           {circles.map((circle) => (
-            <li key={circle.id} className='p-2 border-b border-gray-300 cursor-pointer' onClick={() => handleCircleClick(circle.id)}>
-              {circle.name}
+            <li key={circle.uid} className='p-2 border rounded shadow cursor-pointer' onClick={() => handleCircleClick(circle.uid)}>
+              <img src={circle.circlesImageId} alt={circle.name} className='w-full h-48 object-cover rounded' />
+              <p className='mt-2 text-center'>{circle.name}</p>
             </li>
           ))}
         </ul>
