@@ -19,7 +19,7 @@ export const handleLogin = async (props: AuthProps): Promise<boolean> => {
     alert("Login successful!");
     return true;
   } catch (error) {
-    alert("woe");
+    alert("Login failed!");
     return false;
   } finally {
     setIsLoading(false);
@@ -45,6 +45,7 @@ export const handleSignUp = async (props: AuthProps): Promise<boolean> => {
         email,
         displayName,
         userId: data.user.id,
+        password,
       });
 
     if (dbError) throw dbError;

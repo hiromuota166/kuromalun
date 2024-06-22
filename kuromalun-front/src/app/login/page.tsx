@@ -19,7 +19,7 @@ const LoginPage = () => {
     event.preventDefault();
     const isSuccess = await handleLogin({ email, password, setIsLoading, displayName: "" });
     if (isSuccess) {
-      router.push('/test');
+      router.push('/user');
     }
   };
 

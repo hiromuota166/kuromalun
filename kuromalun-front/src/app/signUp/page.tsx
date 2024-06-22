@@ -2,18 +2,23 @@
 
 import React, { useState } from 'react';
 import { handleSignUp } from "../../components/Auth";
+import { useRouter } from 'next/navigation';
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const isSuccess = await handleSignUp({ email, password, displayName, setIsLoading });
     if (isSuccess) {
       // Redirect or show success message
+      router.push('/login');
+    } else {
+      alert("Account creation failed. Please try again.");
     }
   };
 
