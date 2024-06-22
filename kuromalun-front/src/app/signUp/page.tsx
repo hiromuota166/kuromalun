@@ -14,6 +14,7 @@ const SignUpPage = () => {
     const isSuccess = await handleSignUp({ email, password, displayName, setIsLoading });
     if (isSuccess) {
       // Redirect or show success message
+      alert("Account created successfully!");
     }
   };
 
