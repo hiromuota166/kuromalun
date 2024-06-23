@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '@/utils/supabase';
@@ -25,9 +25,11 @@ const Page = () => {
   const listAllImage = async () => {
     const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId, activity, place, time, size, link');
     if (error) {
-      console.log(error);
+      console.log('Error fetching circles:', error);
       return;
     }
+
+    console.log('Fetched circles data:', data);
 
     if (Array.isArray(data)) {
       setCircles(data as Circle[]);
@@ -41,13 +43,14 @@ const Page = () => {
   }, []);
 
   const handleCircleClick = (circle: Circle) => {
+    console.log('Circle clicked:', circle);
     setSelectedCircle(circle);
     onOpen();
   };
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-center text-2xl font-bold mb-4">サークル一覧</h1>
+      <h1 className="text-center text-2xl font-bold mb=4">サークル一覧</h1>
       <div className="flex flex-wrap">
         {circles.map(circle => (
           <div key={circle.uid} className="w-1/4 p-2">
