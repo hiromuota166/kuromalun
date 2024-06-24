@@ -17,7 +17,7 @@ interface CircleUpdateModalProps {
   circle: Circle | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: () => void;  // 追加：更新後の処理
+  onUpdate: () => void;
 }
 
 export const CircleUpdateModal: React.FC<CircleUpdateModalProps> = ({ circle, isOpen, onClose, onUpdate }) => {
@@ -54,7 +54,7 @@ export const CircleUpdateModal: React.FC<CircleUpdateModalProps> = ({ circle, is
       if (error) {
         console.error('Error updating circle:', error);
       } else {
-        onUpdate();  // 更新後の処理を呼び出し
+        onUpdate();
         onClose();
       }
     }

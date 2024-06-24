@@ -5,6 +5,7 @@ import { supabase } from '../../utils/supabase';
 import { useRouter } from 'next/navigation';
 import { CircleUpdateModal } from '@/components/CircleUpdateModal';
 import { useDisclosure } from '@chakra-ui/hooks';
+import { v4 as uuidv4 } from 'uuid';
 
 interface Circle {
   uid: string;
@@ -18,50 +19,46 @@ interface Circle {
 }
 
 const Page: React.FC = () => {
+  const [file, setFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [selectedCircle, setSelectedCircle] = useState<Circle | null>(null);
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [isLoading, setIsLoading] = useState(false);
+  const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchUserData = async () => {
     const { data, error } = await supabase.auth.getUser();
     const user = data?.user;
 
-    console.log('User data:', data);
-    console.log('User fetch error:', error);
-
     if (!user) {
-      console.log('No user found, redirecting to login...');
       router.push('/login');
       return;
     }
 
     setUserEmail(user.email ?? null);
+    setUid(user.id);
 
     // ユーザーのdisplayNameを取得
-    const { data: userData, error: userError } = await supabase
+    const { data: userData } = await supabase
       .from('users')
-      .select('displayName')
+      .select('displayName, userImage')
       .eq('userId', user.id)
       .single();
 
-    console.log('User profile data:', userData);
-    console.log('User profile fetch error:', userError);
-
     if (userData) {
       setDisplayName(userData.displayName ?? null);
+      setPreviewUrl(userData.userImage ?? null);
     }
 
     // ユーザーが作成したサークルを取得
-    const { data: circleData, error: circleError } = await supabase
+    const { data: circleData } = await supabase
       .from('circles')
-      .select('uid, name, circlesImageId, activity, place, time, size, link')  // その他のフィールドも追加
+      .select('uid, name, circlesImageId, activity, place, time, size, link')
       .eq('ownerId', user.id);
-
-    console.log('Circles data:', circleData);
-    console.log('Circles fetch error:', circleError);
 
     if (circleData) {
       setCircles(circleData);
@@ -71,13 +68,8 @@ const Page: React.FC = () => {
   useEffect(() => {
     fetchUserData();
 
-    // authStateChangeリスナーの設定
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state change event:', event);
-      console.log('Auth state change session:', session);
-
+    const { data: authListener } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'SIGNED_OUT') {
-        console.log('User signed out, redirecting to home...');
         router.push('/');
       }
     });
@@ -87,32 +79,108 @@ const Page: React.FC = () => {
     };
   }, [router]);
 
-  const handleCircleClick = (circle: Circle) => {
-    console.log('Circle clicked:', circle.uid);
-    setSelectedCircle(circle);
-    onOpen();
-  };
-
   const handleLogout = async () => {
     const confirmed = confirm('本当にログアウトしますか？');
     if (confirmed) {
-      console.log('User confirmed logout');
       await supabase.auth.signOut();
-    } else {
-      console.log('User canceled logout');
     }
   };
 
   const handleUpdate = async () => {
-    // サークルのリストを更新
     await fetchUserData();
   };
 
+  const handleChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
+    }
+  };
+
+  const handleCircleClick = (circle: Circle) => {
+    setSelectedCircle(circle);
+    onOpen();
+  };
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setIsLoading(true);
+
+    if (file && file.type.match("image.*")) {
+      const fileExtension = file.name.split(".").pop();
+      const filePath = `img/${uuidv4()}.${fileExtension}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('user-image')
+        .upload(filePath, file);
+
+      if (uploadError) {
+        alert("画像のアップロードに失敗しました");
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: urlData } = await supabase.storage
+        .from('user-image')
+        .getPublicUrl(filePath);
+
+      if (!urlData) {
+        alert("画像のURLの取得に失敗しました");
+        setIsLoading(false);
+        return;
+      }
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ userImage: urlData.publicUrl })
+        .eq('userId', uid);
+
+      if (updateError) {
+        alert("画像の更新に失敗しました");
+        setIsLoading(false);
+        return;
+      }
+
+      await fetchUserData();
+    }
+
+    setIsLoading(false);
+  };
+
   return (
-    <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
+    <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-gray-100 text-gray-900'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
         <p className='text-2xl font-bold'>{displayName} ({userEmail})</p>
       </div>
+      <form className='w-4/5' onSubmit={handleSubmit}>
+        <div className='mb-4'>
+          <p className='mb-2'>ユーザー画像</p>
+          <input
+            aria-label='ユーザー画像'
+            type="file"
+            className='w-full p-2 border border-gray-300 rounded'
+            onChange={handleChangeFile}
+          />
+        </div>
+        {previewUrl && (
+          <div className='mt-4'>
+            <img src={previewUrl} alt="Preview" className='w-32 h-32 object-cover rounded-full' />
+          </div>
+        )}
+        <button
+          type='submit'
+          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-150'
+          aria-label='決定ボタン'
+          disabled={isLoading}
+        >
+          保存
+        </button>
+      </form>
       <div className='w-full flex-1 flex flex-col items-center justify-start'>
         <h2 className='text-xl font-bold mt-10'>あなたが作成したサークル</h2>
         <ul className='w-4/5 mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
@@ -125,7 +193,7 @@ const Page: React.FC = () => {
         </ul>
         <button
           onClick={handleLogout}
-          className='mt-10 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700'
+          className='mt-10 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition duration-150'
         >
           ログアウト
         </button>
