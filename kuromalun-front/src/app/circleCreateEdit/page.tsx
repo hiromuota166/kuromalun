@@ -36,7 +36,7 @@ const CircleCreateEditPage: React.FC = () => {
     const fileExtension = image.name.split('.').pop();
     const filePath = `img/${uuidv4()}.${fileExtension}`;
     const { error: uploadError } = await supabase.storage
-      .from('public-image-bucket')
+      .from('circle-image')
       .upload(filePath, image);
 
     if (uploadError) {
@@ -45,7 +45,7 @@ const CircleCreateEditPage: React.FC = () => {
     }
 
     const { data } = supabase.storage
-      .from('public-image-bucket')
+      .from('circle-image')
       .getPublicUrl(filePath);
 
     if (!data) {
