@@ -4,10 +4,10 @@ import React, { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import { useRouter } from 'next/navigation';
 import { CircleUpdateModal } from '@/components/CircleUpdateModal';
+import { UserUpdateModal } from '@/components/UserUpdateModal';
 import { useDisclosure } from '@chakra-ui/hooks';
-import { v4 as uuidv4 } from 'uuid';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import UserIcon from '@/components/UserIcon';
-import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 interface Circle {
   uid: string;
@@ -20,6 +20,12 @@ interface Circle {
   link?: string;
 }
 
+interface User {
+  uid: string;
+  displayName: string;
+  userImage?: string;
+}
+
 const Page: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -27,7 +33,9 @@ const Page: React.FC = () => {
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [circles, setCircles] = useState<Circle[]>([]);
   const [selectedCircle, setSelectedCircle] = useState<Circle | null>(null);
-  const { isOpen, onOpen, onClose } = useDisclosure();
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const { isOpen: isCircleModalOpen, onOpen: onCircleModalOpen, onClose: onCircleModalClose } = useDisclosure();
+  const { isOpen: isUserModalOpen, onOpen: onUserModalOpen, onClose: onUserModalClose } = useDisclosure();
   const [isLoading, setIsLoading] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
   const router = useRouter();
@@ -54,6 +62,7 @@ const Page: React.FC = () => {
     if (userData) {
       setDisplayName(userData.displayName ?? null);
       setPreviewUrl(userData.userImage ?? null);
+      setCurrentUser({ uid: user.id, displayName: userData.displayName, userImage: userData.userImage });
     }
 
     // ユーザーが作成したサークルを取得
@@ -85,66 +94,9 @@ const Page: React.FC = () => {
     await fetchUserData();
   };
 
-  const handleChangeFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewUrl(reader.result as string);
-      };
-      reader.readAsDataURL(selectedFile);
-    }
-  };
-
   const handleCircleClick = (circle: Circle) => {
     setSelectedCircle(circle);
-    onOpen();
-  };
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    setIsLoading(true);
-
-    if (file && file.type.match("image.*")) {
-      const fileExtension = file.name.split(".").pop();
-      const filePath = `img/${uuidv4()}.${fileExtension}`;
-
-      const { error: uploadError } = await supabase.storage
-        .from('user-image')
-        .upload(filePath, file);
-
-      if (uploadError) {
-        alert("画像のアップロードに失敗しました");
-        setIsLoading(false);
-        return;
-      }
-
-      const { data: urlData } = await supabase.storage
-        .from('user-image')
-        .getPublicUrl(filePath);
-
-      if (!urlData) {
-        alert("画像のURLの取得に失敗しました");
-        setIsLoading(false);
-        return;
-      }
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ userImage: urlData.publicUrl })
-        .eq('userId', uid);
-
-      if (updateError) {
-        alert("画像の更新に失敗しました");
-        setIsLoading(false);
-        return;
-      }
-
-      await fetchUserData();
-    }
-
-    setIsLoading(false);
+    onCircleModalOpen();
   };
 
   return (
@@ -158,7 +110,7 @@ const Page: React.FC = () => {
               </div>
               <div aria-label='名前側' className='mt-4 flex justify-between'>
                 <h1 className='text-xl font-bold w-3/4'>{displayName}</h1>
-                <button className='border rounded-3xl'>
+                <button className='border rounded-3xl' onClick={onUserModalOpen}>
                   <p className='px-4'>編集</p>
                 </button>
               </div>
@@ -196,6 +148,8 @@ const Page: React.FC = () => {
         </Tabs>
       </div>
 
+      <UserUpdateModal user={currentUser} isOpen={isUserModalOpen} onClose={onUserModalClose} onUpdate={handleUpdate} />
+      <CircleUpdateModal circle={selectedCircle} isOpen={isCircleModalOpen} onClose={onCircleModalClose} onUpdate={handleUpdate} />
     </div>
   );
 };
