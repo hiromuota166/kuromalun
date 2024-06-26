@@ -50,15 +50,25 @@ const Page = () => {
 
   return (
     <div className="container mx-auto">
-      <h1 className="text-center text-2xl font-bold mb=4">サークル一覧</h1>
-      <div className="flex flex-wrap">
+      <h1 className="text-center text-2xl font-bold my-4">サークル一覧</h1>
+      <div className="flex flex-wrap mx-3">
         {circles.map(circle => (
           <div key={circle.uid} className="w-1/4 p-2">
-            <div onClick={() => handleCircleClick(circle)} className="cursor-pointer">
-              <img src={circle.circlesImageId} alt={circle.name} className="w-full h-32 object-cover" />
-              <p className="text-center mt-2">{circle.name}</p>
+            <div
+              onClick={() => handleCircleClick(circle)}
+              className="cursor-pointer rounded-lg overflow-hidden flex flex-col items-center"
+            >
+              <div className="w-24 h-24 rounded-2xl overflow-hidden">
+                <img
+                  src={circle.circlesImageId}
+                  alt={circle.name}
+                  className="w-full h-full object-cover rounded-2xl"
+                />
+              </div>
+              <p className="w-20 text-center mt-2 truncate">{circle.name}</p>
             </div>
           </div>
+
         ))}
       </div>
       <DetailModal circle={selectedCircle} isOpen={isOpen} onClose={onClose} />
