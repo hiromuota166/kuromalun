@@ -60,7 +60,7 @@ const Navigation: React.FC = () => {
           </li>
         </ul>
         <ul className='flex items-center'>
-          <UserIcon />
+          <UserIcon w={34} h={34}/>
         </ul>
       </nav>
       <div></div>

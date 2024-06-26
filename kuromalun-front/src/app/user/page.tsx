@@ -6,6 +6,8 @@ import { useRouter } from 'next/navigation';
 import { CircleUpdateModal } from '@/components/CircleUpdateModal';
 import { useDisclosure } from '@chakra-ui/hooks';
 import { v4 as uuidv4 } from 'uuid';
+import UserIcon from '@/components/UserIcon';
+import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react'
 
 interface Circle {
   uid: string;
@@ -79,13 +81,6 @@ const Page: React.FC = () => {
     };
   }, [router]);
 
-  const handleLogout = async () => {
-    const confirmed = confirm('本当にログアウトしますか？');
-    if (confirmed) {
-      await supabase.auth.signOut();
-    }
-  };
-
   const handleUpdate = async () => {
     await fetchUserData();
   };
@@ -114,7 +109,7 @@ const Page: React.FC = () => {
     if (file && file.type.match("image.*")) {
       const fileExtension = file.name.split(".").pop();
       const filePath = `img/${uuidv4()}.${fileExtension}`;
-      
+
       const { error: uploadError } = await supabase.storage
         .from('user-image')
         .upload(filePath, file);
@@ -154,51 +149,53 @@ const Page: React.FC = () => {
 
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-gray-100 text-gray-900'>
-      <div className='w-full h-[20vh] flex items-center justify-center'>
-        <p className='text-2xl font-bold'>{displayName} ({userEmail})</p>
-      </div>
-      <form className='w-4/5' onSubmit={handleSubmit}>
-        <div className='mb-4'>
-          <p className='mb-2'>ユーザー画像</p>
-          <input
-            aria-label='ユーザー画像'
-            type="file"
-            className='w-full p-2 border border-gray-300 rounded'
-            onChange={handleChangeFile}
-          />
-        </div>
-        {previewUrl && (
-          <div className='mt-4'>
-            <img src={previewUrl} alt="Preview" className='w-32 h-32 object-cover rounded-full' />
+      <header aria-label='ユーザー情報' className='w-screen bg-yellow-600'>
+        <div aria-label='ヘッダー横幅調整' className='h-full px-5'>
+          <div aria-label='ヘッダー縦幅調整' className='h-full py-8'>
+            <div className=''>
+              <div aria-label='画像側'>
+                <UserIcon w={84} h={84} />
+              </div>
+              <div aria-label='名前側' className='mt-4 flex justify-between'>
+                <h1 className='text-xl font-bold w-3/4'>{displayName}</h1>
+                <button className='border rounded-3xl'>
+                  <p className='px-4'>編集</p>
+                </button>
+              </div>
+            </div>
           </div>
-        )}
-        <button
-          type='submit'
-          className='mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 transition duration-150'
-          aria-label='決定ボタン'
-          disabled={isLoading}
-        >
-          保存
-        </button>
-      </form>
-      <div className='w-full flex-1 flex flex-col items-center justify-start'>
-        <h2 className='text-xl font-bold mt-10'>あなたが作成したサークル</h2>
-        <ul className='w-4/5 mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-          {circles.map((circle) => (
-            <li key={circle.uid} className='p-2 border rounded shadow cursor-pointer' onClick={() => handleCircleClick(circle)}>
-              <img src={circle.circlesImageId} alt={circle.name} className='w-full h-48 object-cover rounded' />
-              <p className='mt-2 text-center'>{circle.name}</p>
-            </li>
-          ))}
-        </ul>
-        <button
-          onClick={handleLogout}
-          className='mt-10 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700 transition duration-150'
-        >
-          ログアウト
-        </button>
+        </div>
+      </header>
+      <div aria-label='付属情報タブ' className='w-screen px-5'>
+        <Tabs>
+          <TabList>
+            <Tab>Your circle</Tab>
+            <Tab>Like</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <div className='w-full flex-1 flex flex-col items-center justify-start' aria-label='ユーザー付属情報'>
+                <h2 className='text-xl font-bold mt-10'>あなたが作成したサークル</h2>
+                <ul className='w-4/5 mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
+                  {circles.map((circle) => (
+                    <li key={circle.uid} className='p-2 border rounded shadow cursor-pointer' onClick={() => handleCircleClick(circle)}>
+                      <img src={circle.circlesImageId} alt={circle.name} className='w-full h-48 object-cover rounded' />
+                      <p className='mt-2 text-center'>{circle.name}</p>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </TabPanel>
+            <TabPanel>
+              <div className='w-full flex-1 flex flex-col items-center justify-start' aria-label='ユーザー付属情報'>
+                <h2 className='text-xl font-bold mt-10'>あなたがいいねしたサークル</h2>
+                <p>to be continue...</p>
+              </div>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
       </div>
-      <CircleUpdateModal circle={selectedCircle} isOpen={isOpen} onClose={onClose} onUpdate={handleUpdate} />
+
     </div>
   );
 };
