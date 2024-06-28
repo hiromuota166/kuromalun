@@ -102,6 +102,7 @@ const CircleCreateEditPage: React.FC = () => {
 
   return (
     <div className='h-[calc(100vh)] flex flex-col items-center bg-backgroundColor text-mainColor my-6'>
+      <h1 className="text-center text-2xl font-bold my-4">サークル掲示板作成画面</h1>
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={handleSubmit}>
         <div className='w-4/5'>
           <div className=''>

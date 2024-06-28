@@ -46,7 +46,7 @@ export function DetailModal({ circle, isOpen, onClose }: DetailModalProps) {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose}>
+    <Modal isOpen={isOpen} onClose={onClose} size={'3xl'}>
       <ModalOverlay />
       <ModalContent>
         <ModalHeader>サークル詳細</ModalHeader>
