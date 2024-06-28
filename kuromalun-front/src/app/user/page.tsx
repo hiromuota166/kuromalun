@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../utils/supabase';
@@ -8,23 +8,7 @@ import { UserUpdateModal } from '@/components/UserUpdateModal';
 import { useDisclosure } from '@chakra-ui/hooks';
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from '@chakra-ui/react';
 import UserIcon from '@/components/UserIcon';
-
-interface Circle {
-  uid: string;
-  name: string;
-  circlesImageId: string;
-  activity?: string;
-  place?: string;
-  time?: string;
-  size?: string;
-  link?: string;
-}
-
-interface User {
-  uid: string;
-  displayName: string;
-  userImage?: string;
-}
+import { Circle, User } from '../../types/types';
 
 const Page: React.FC = () => {
   const [file, setFile] = useState<File | null>(null);
