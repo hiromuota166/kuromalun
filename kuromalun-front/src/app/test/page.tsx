@@ -16,7 +16,7 @@ const Page = () => {
   const listAllImage = async () => {
     const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId');
     if (error) {
-      console.log(error);
+      console.error(error);
       return;
     }
 

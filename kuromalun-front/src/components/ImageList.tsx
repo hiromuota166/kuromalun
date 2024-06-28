@@ -13,10 +13,9 @@ const ImageList = async (props:ImageListProps) => {
     .eq('uid', uid)
 
   if (error) {
-    console.log(error)
+    console.error(error)
     return
   }
-  console.log(data)
   return (
     <div>ImageList</div>
   )

@@ -3,11 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { handleLogin } from "../../components/Auth";
+import AlertComponent from '../../components/AlertComponent'; // 適切なパスに変更してください
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 
@@ -17,7 +20,7 @@ const LoginPage = () => {
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const isSuccess = await handleLogin({ email, password, setIsLoading, displayName: "" });
+    const isSuccess = await handleLogin({ email, password, setIsLoading, displayName: "", setAlertMessage, setAlertColorScheme });
     if (isSuccess) {
       router.push('/user');
     }
@@ -30,7 +33,7 @@ const LoginPage = () => {
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
-        <p className='text-4xl font-bold '>Log in</p>
+        <p className='text-4xl font-bold'>Log in</p>
       </div>
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={onSubmit}>
         <div className='w-4/5 mt-5'>
@@ -68,6 +71,13 @@ const LoginPage = () => {
           新規作成ページ
         </a>
       </form>
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
     </div>
   );
 };

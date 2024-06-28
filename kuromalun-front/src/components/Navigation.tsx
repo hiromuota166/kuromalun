@@ -2,14 +2,17 @@
 import React, { useEffect, useState } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { Spinner, Center } from '@chakra-ui/react';
-import UserIcon from './UserIcon';
 import { supabase } from '../utils/supabase';
+import UserIconChakra from './UserIconChakra';
+import AlertComponent from './AlertComponent';
 
 const Navigation: React.FC = () => {
   const pathname = usePathname();
   const router = useRouter();
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -45,7 +48,8 @@ const Navigation: React.FC = () => {
     if (user || path === '/' || path === '/login') {
       router.push(path);
     } else {
-      alert('ログインしてください');
+      setAlertMessage('ログインしてください');
+      setAlertColorScheme('red');
       router.push('/login');
     }
     setIsLoading(false);
@@ -58,6 +62,13 @@ const Navigation: React.FC = () => {
           <Spinner size="xl" />
         </Center>
       )}
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
       <nav className='fixed z-50 bg-backgroundColor w-full flex justify-between items-center'>
         <ul className='items-center flex'>
           <li className='justify-center'>
@@ -68,7 +79,7 @@ const Navigation: React.FC = () => {
           </li>
         </ul>
         <ul className='flex items-center pr-5'>
-          <UserIcon w={34} h={34} />
+          <UserIconChakra w={34} h={34} />
         </ul>
       </nav>
       <div></div>
