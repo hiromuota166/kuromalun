@@ -1,16 +1,11 @@
-'use client'
+'use client';
 import React, { useState, useEffect } from 'react';
 import { Icon } from '@chakra-ui/react';
 import { IoPersonCircle } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabase';
-import {
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-} from '@chakra-ui/react';
-import AlertComponent from './AlertComponent';
+import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
+import ConfirmationDialog from './ConfirmationDialog';
 
 interface UserIconProps {
   w: number;
@@ -20,22 +15,22 @@ interface UserIconProps {
 const UserIconChakra = ({ w, h }: UserIconProps) => {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
+  const [alertStatus, setAlertStatus] = useState<"error" | "info" | "warning" | "success" | "loading">("info");
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
   const router = useRouter();
 
   const handleLogout = async () => {
-    const confirmed = confirm('本当にログアウトしますか？');
-    if (confirmed) {
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
-        setAlertColorScheme('red');
-      } else {
-        setAlertMessage('ログアウトしました');
-        setAlertColorScheme('blue');
-        router.push('/');
-      }
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
+      setAlertStatus("error");
+    } else {
+      setAlertMessage('ログアウトしました');
+      setAlertStatus("success");
+      router.push('/');
     }
+    setIsAlertOpen(true);
   };
 
   useEffect(() => {
@@ -61,18 +56,32 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
       router.push(path);
     } else {
       setAlertMessage('ログインしてください');
-      setAlertColorScheme('blue');
+      setAlertStatus("warning");
+      setIsAlertOpen(true);
       router.push('/login');
     }
+  };
+
+  const confirmLogout = () => {
+    setAlertMessage('本当にログアウトしますか？');
+    setAlertStatus("warning");
+    setShowConfirm(true);
+    setIsAlertOpen(true);
   };
 
   return (
     <div className='relative justify-center content-center'>
       {alertMessage && (
-        <AlertComponent 
+        <ConfirmationDialog 
           message={alertMessage} 
-          colorScheme={alertColorScheme} 
-          onClose={() => setAlertMessage(null)} 
+          colorScheme={alertStatus} 
+          isOpen={isAlertOpen}
+          onClose={() => {
+            setIsAlertOpen(false);
+            setShowConfirm(false);
+          }}
+          showConfirmButtons={showConfirm}
+          onConfirm={handleLogout}
         />
       )}
       <Menu isLazy>
@@ -97,7 +106,7 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
           <MenuItem onClick={() => handleNavigation('/set')}>
             Settings
           </MenuItem>
-          <MenuItem onClick={handleLogout}>
+          <MenuItem onClick={confirmLogout}>
             Log Out
           </MenuItem>
         </MenuList>
@@ -107,3 +116,4 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
 };
 
 export default UserIconChakra;
+
