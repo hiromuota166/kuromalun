@@ -19,7 +19,7 @@ export const handleLogin = async (props: AuthProps): Promise<boolean> => {
     alert("Login successful!");
     return true;
   } catch (error) {
-    alert("Login failed!");
+    alert("メールを認証してください。");
     return false;
   } finally {
     setIsLoading(false);

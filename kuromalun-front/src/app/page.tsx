@@ -5,7 +5,7 @@ import { supabase } from '@/utils/supabase';
 import { DetailModal } from '@/components/DetailModal';
 import { useDisclosure } from '@chakra-ui/hooks';
 import { Divider } from '@chakra-ui/react'
-import UserIcon from '@/components/UserIcon';
+import CircleOwnerIcon from '@/components/CircleOwnerIcon';
 
 interface Circle {
   uid: string;
@@ -16,27 +16,52 @@ interface Circle {
   time?: string;
   size?: string;
   link?: string;
+  ownerId?: string;
+}
+
+interface User {
+  userId: string;
+  userImage: string;
 }
 
 const Page = () => {
   const [circles, setCircles] = useState<Circle[]>([]);
   const [selectedCircle, setSelectedCircle] = useState<Circle | null>(null);
+  const [users, setUsers] = useState<{ [key: string]: User }>({});
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  // 画像と名前を全て取得し、ステートに保存
   const listAllImage = async () => {
-    const { data, error } = await supabase.from('circles').select('uid, name, circlesImageId, activity, place, time, size, link');
-    if (error) {
-      console.log('Error fetching circles:', error);
+    const { data: circlesData, error: circlesError } = await supabase.from('circles').select('uid, name, circlesImageId, activity, place, time, size, link, ownerId');
+    if (circlesError) {
       return;
     }
 
-    console.log('Fetched circles data:', data);
+    if (Array.isArray(circlesData)) {
+      setCircles(circlesData as Circle[]);
+      const ownerIds = circlesData.map(circle => circle.ownerId);
 
-    if (Array.isArray(data)) {
-      setCircles(data as Circle[]);
+      const { data: usersData, error: usersError } = await supabase
+        .from('users')
+        .select('userId, userImage')
+        .in('userId', ownerIds);
+
+      if (usersError) {
+        console.error('Error fetching users:', usersError);
+        return;
+      }
+
+      const usersMap: { [key: string]: User } = {};
+      if (Array.isArray(usersData)) {
+        usersData.forEach((user: User) => {
+          usersMap[user.userId] = user;
+        });
+      } else {
+        console.error('Unexpected data format:', usersData);
+      }
+
+      setUsers(usersMap);
     } else {
-      console.error('Unexpected data format:', data);
+      console.error('Unexpected data format:', circlesData);
     }
   };
 
@@ -45,7 +70,6 @@ const Page = () => {
   }, []);
 
   const handleCircleClick = (circle: Circle) => {
-    console.log('Circle clicked:', circle);
     setSelectedCircle(circle);
     onOpen();
   };
@@ -75,7 +99,9 @@ const Page = () => {
                   <Divider orientation='horizontal' width='100%' />
                 </div>
                 <div className="truncate h-1/2 items-center justify-start flex">
-                  <UserIcon w={32} h={32}/>
+                  {circle.ownerId && users[circle.ownerId] && (
+                    <CircleOwnerIcon w={32} h={32} avatarUrl={users[circle.ownerId].userImage} />
+                  )}
                   <p className="truncate pl-2">{circle.name}</p>
                 </div>
               </div>
