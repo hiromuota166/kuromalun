@@ -14,16 +14,6 @@ interface CircleOwnerIconProps {
 const CircleOwnerIcon = ({ w, h, avatarUrl }: CircleOwnerIconProps) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [userImage, setUserImage] = useState<string | null>(null);
-  const router = useRouter();
-
-  const handleLogout = async () => {
-    const confirmed = confirm('本当にログアウトしますか？');
-    if (confirmed) {
-      await supabase.auth.signOut();
-      router.push('/');
-    }
-    setMenuOpen(false);
-  };
 
   useEffect(() => {
     const fetchUserImage = async () => {
@@ -37,7 +27,6 @@ const CircleOwnerIcon = ({ w, h, avatarUrl }: CircleOwnerIconProps) => {
         if (error) {
           console.error('Error fetching user image:', error);
         } else {
-          console.log('Fetched user image:', userData);
           if (userData) {
             setUserImage(userData.userImage);
           }
@@ -49,17 +38,6 @@ const CircleOwnerIcon = ({ w, h, avatarUrl }: CircleOwnerIconProps) => {
 
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
-  };
-
-  const handleNavigation = async (path: string) => {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (user) {
-      router.push(path);
-    } else {
-      alert('ログインしてください。');
-      router.push('/login');
-    }
-    setMenuOpen(false);
   };
 
   return (
@@ -83,31 +61,6 @@ const CircleOwnerIcon = ({ w, h, avatarUrl }: CircleOwnerIconProps) => {
           <Icon as={IoPersonCircle} w={w} h={h} color={'#000'} />
         )}
       </div>
-      {menuOpen && (
-        <div className='absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg'>
-          <a 
-            href="#"
-            onClick={() => handleNavigation('/user')}
-            className='block px-4 py-2 text-black hover:bg-gray-200 bg-backgroundColor hover:text-emphasisColor transition duration-150'
-          >
-            User Page
-          </a>
-          <a 
-            href="#"
-            onClick={() => handleNavigation('/set')}
-            className='block px-4 py-2 text-black hover:bg-gray-200 bg-backgroundColor hover:text-emphasisColor transition duration-150'
-          >
-            Settings
-          </a>
-          <a 
-            href="#"
-            onClick={handleLogout}
-            className='block px-4 py-2 text-black hover:bg-gray-200 bg-backgroundColor hover:text-emphasisColor transition duration-150'
-          >
-            Log Out
-          </a>
-        </div>
-      )}
     </div>
   );
 };

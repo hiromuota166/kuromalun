@@ -9,11 +9,8 @@ import {
   MenuButton,
   MenuList,
   MenuItem,
-  MenuItemOption,
-  MenuGroup,
-  MenuOptionGroup,
-  MenuDivider,
-} from '@chakra-ui/react'
+} from '@chakra-ui/react';
+import AlertComponent from './AlertComponent';
 
 interface UserIconProps {
   w: number;
@@ -21,17 +18,24 @@ interface UserIconProps {
 }
 
 const UserIconChakra = ({ w, h }: UserIconProps) => {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [userImage, setUserImage] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
   const router = useRouter();
 
   const handleLogout = async () => {
     const confirmed = confirm('本当にログアウトしますか？');
     if (confirmed) {
-      await supabase.auth.signOut();
-      router.push('/');
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
+        setAlertColorScheme('red');
+      } else {
+        setAlertMessage('ログアウトしました');
+        setAlertColorScheme('blue');
+        router.push('/');
+      }
     }
-    setMenuOpen(false);
   };
 
   useEffect(() => {
@@ -51,23 +55,26 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
     fetchUserImage();
   }, []);
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
-
   const handleNavigation = async (path: string) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (user) {
       router.push(path);
     } else {
-      alert('ログインしてください。');
+      setAlertMessage('ログインしてください');
+      setAlertColorScheme('blue');
       router.push('/login');
     }
-    setMenuOpen(false);
   };
 
   return (
     <div className='relative justify-center content-center'>
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
       <Menu isLazy>
         <MenuButton>
           <div className='cursor-pointer'>
@@ -84,35 +91,15 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
           </div>
         </MenuButton>
         <MenuList>
-          <div className=''>
-            <MenuItem>
-              <a
-                href="#"
-                onClick={() => handleNavigation('/user')}
-                className=''
-              >
-                User Page
-              </a>
-            </MenuItem>
-            <MenuItem>
-              <a
-                href="#"
-                onClick={() => handleNavigation('/set')}
-                className=''
-              >
-                Settings
-              </a>
-            </MenuItem>
-            <MenuItem>
-              <a
-                href="#"
-                onClick={handleLogout}
-                className=''
-              >
-                Log Out
-              </a>
-            </MenuItem>
-          </div>
+          <MenuItem onClick={() => handleNavigation('/user')}>
+            User Page
+          </MenuItem>
+          <MenuItem onClick={() => handleNavigation('/set')}>
+            Settings
+          </MenuItem>
+          <MenuItem onClick={handleLogout}>
+            Log Out
+          </MenuItem>
         </MenuList>
       </Menu>
     </div>

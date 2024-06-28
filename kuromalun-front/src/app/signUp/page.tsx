@@ -3,29 +3,29 @@
 import React, { useState } from 'react';
 import { handleSignUp } from "../../components/Auth";
 import { useRouter } from 'next/navigation';
+import AlertComponent from '../../components/AlertComponent';
 
 const SignUpPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
   const router = useRouter();
 
   const onSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const isSuccess = await handleSignUp({ email, password, displayName, setIsLoading });
+    const isSuccess = await handleSignUp({ email, password, displayName, setIsLoading, setAlertMessage, setAlertColorScheme });
     if (isSuccess) {
-      // Redirect or show success message
       router.push('/login');
-    } else {
-      alert("Account creation failed. Please try again.");
     }
   };
 
   return (
     <div className='h-[calc(100vh-56px)] flex flex-col items-center bg-backgroundColor text-mainColor'>
       <div className='w-full h-[20vh] flex items-center justify-center'>
-        <p className='text-4xl font-bold '>Create New Account</p>
+        <p className='text-4xl font-bold'>Create New Account</p>
       </div>
       <form className='w-full flex-1 flex flex-col items-center justify-start' onSubmit={onSubmit}>
         <div className='w-4/5'>
@@ -74,6 +74,13 @@ const SignUpPage = () => {
           ログインページ
         </a>
       </form>
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
     </div>
   );
 };

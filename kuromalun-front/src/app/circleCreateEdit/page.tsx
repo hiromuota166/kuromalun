@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/navigation';
+import AlertComponent from '../../components/AlertComponent';
 
 const CircleCreateEditPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -17,46 +18,22 @@ const CircleCreateEditPage: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>("red");
   const router = useRouter();
 
   const public_url = "https://ntbxlozqezrwdpqphirl.supabase.co/storage/v1/object/public/circle-image/"
 
   const handleChangeFile = (e: any) => {
     if (e.target.files.length !== 0) {
-      const selectedFile = e.target.files[0]
-      setFile(selectedFile)
-      const reader = new FileReader()
+      const selectedFile = e.target.files[0];
+      setFile(selectedFile);
+      const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewUrl(reader.result as string)
-      }
-      reader.readAsDataURL(selectedFile)
+        setPreviewUrl(reader.result as string);
+      };
+      reader.readAsDataURL(selectedFile);
     }
-  }
-
-  const handleImageUpload = async () => {
-    if (!image) return "";
-
-    const fileExtension = image.name.split('.').pop();
-    const filePath = `img/${uuidv4()}.${fileExtension}`;
-    const { error: uploadError } = await supabase.storage
-      .from('circle-image')
-      .upload(filePath, image);
-
-    if (uploadError) {
-      console.error("Image upload failed:", uploadError);
-      return "";
-    }
-
-    const { data } = supabase.storage
-      .from('circle-image')
-      .getPublicUrl(filePath);
-
-    if (!data) {
-      console.error("Getting public URL failed");
-      return "";
-    }
-
-    return data.publicUrl;
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -66,25 +43,28 @@ const CircleCreateEditPage: React.FC = () => {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) {
-      alert("ログインしてください");
+      setAlertMessage("ログインしてください");
       setIsLoading(false);
       return;
     }
-    if (file!!.type.match("image.*")) {
+
+    if (file && file.type.match("image.*")) {
       // 画像の拡張子を取得
-      const fileExtension = file!!.name.split(".").pop()
-      const filePath = `img/${uuidv4()}.${fileExtension}`
+      const fileExtension = file.name.split(".").pop();
+      const filePath = `img/${uuidv4()}.${fileExtension}`;
+
       // 画像をアップロード
       const { error: uploadError } = await supabase.storage
         .from('circle-image')
-        .upload(filePath, file!!)
+        .upload(filePath, file);
 
       // アップロードエラーがあればアラート表示
       if (uploadError) {
-        alert("エラーが発生しました：" + uploadError.message)
-        return
+        setAlertMessage("エラーが発生しました：" + uploadError.message);
+        setIsLoading(false);
+        return;
       }
-      const fileUrl = `${public_url}${filePath}`
+      const fileUrl = `${public_url}${filePath}`;
 
       const newCircle = {
         name,
@@ -96,22 +76,26 @@ const CircleCreateEditPage: React.FC = () => {
         ownerId: user.id,
         circlesImageId: fileUrl,
       };
-      
-      const { error: insertError } = await supabase.from('circles').insert([newCircle])
-      
+
+      const { error: insertError } = await supabase.from('circles').insert([newCircle]);
+
       // 挿入エラーがあればアラート表示
       if (insertError) {
-        alert("エラーが発生しました：" + insertError.message)
-        return
+        setAlertMessage("エラーが発生しました：" + insertError.message);
+        setIsLoading(false);
+        return;
       }
 
       // アップロードと挿入が成功したらファイルとプレビューをリセット
-      setFile(null)
-      setPreviewUrl(null)
+      setFile(null);
+      setPreviewUrl(null);
     } else {
       // 画像ファイル以外はアラート表示
-      alert("画像ファイル以外はアップロード出来ません。")
+      setAlertMessage("画像ファイル以外はアップロード出来ません。");
+      setIsLoading(false);
+      return;
     }
+
     setIsLoading(false);
     router.push('/user');
   };
@@ -127,7 +111,7 @@ const CircleCreateEditPage: React.FC = () => {
             aria-label='サークル画像'
             type='file'
             className='w-full h-16 rounded-xl p-2 mt-2 border-2'
-            onChange={(e) => {handleChangeFile(e) }}
+            onChange={handleChangeFile}
           />
         </div>
         <div className='w-4/5'>
@@ -210,6 +194,13 @@ const CircleCreateEditPage: React.FC = () => {
           保存
         </button>
       </form>
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
     </div>
   );
 };

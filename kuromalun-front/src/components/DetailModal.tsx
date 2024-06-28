@@ -31,10 +31,7 @@ interface DetailModalProps {
 export function DetailModal({ circle, isOpen, onClose }: DetailModalProps) {
   if (!circle) return null;
 
-  console.log('Received circle:', circle);
-
   const renderLinks = (links: any) => {
-    console.log('Received links:', links);
     if (Array.isArray(links)) {
       return links.map((link: { url: string; title: string }, index: number) => (
         <div key={index}>

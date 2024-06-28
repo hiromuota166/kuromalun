@@ -5,10 +5,12 @@ interface AuthProps {
   password: string;
   displayName: string;
   setIsLoading: (isLoading: boolean) => void;
+  setAlertMessage: (message: string | null) => void;
+  setAlertColorScheme: (color: string) => void;
 }
 
 export const handleLogin = async (props: AuthProps): Promise<boolean> => {
-  const { email, password, displayName, setIsLoading } = props;
+  const { email, password, displayName, setIsLoading, setAlertMessage, setAlertColorScheme } = props;
   try {
     setIsLoading(true);
     const { error } = await supabase.auth.signInWithPassword({
@@ -16,10 +18,12 @@ export const handleLogin = async (props: AuthProps): Promise<boolean> => {
       password,
     });
     if (error) throw error;
-    alert("Login successful!");
+    setAlertMessage("Login successful!");
+    setAlertColorScheme('blue');
     return true;
   } catch (error) {
-    alert("メールを認証してください。");
+    setAlertMessage("メールを認証してください。");
+    setAlertColorScheme('red');
     return false;
   } finally {
     setIsLoading(false);
@@ -27,7 +31,7 @@ export const handleLogin = async (props: AuthProps): Promise<boolean> => {
 };
 
 export const handleSignUp = async (props: AuthProps): Promise<boolean> => {
-  const { email, password, displayName, setIsLoading } = props;
+  const { email, password, displayName, setIsLoading, setAlertMessage, setAlertColorScheme } = props;
   try {
     setIsLoading(true);
     const { data, error } = await supabase.auth.signUp({
@@ -50,10 +54,12 @@ export const handleSignUp = async (props: AuthProps): Promise<boolean> => {
 
     if (dbError) throw dbError;
 
-    alert("Sign up successful!");
+    setAlertMessage("Sign up successful!");
+    setAlertColorScheme('blue');
     return true;
   } catch (error: any) {
-    alert(`Error: ${error.message || error}`);
+    setAlertMessage(`Error: ${error.message || error}`);
+    setAlertColorScheme('red');
     return false;
   } finally {
     setIsLoading(false);
