@@ -10,6 +10,9 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "kuromalun",
   description: "立命館大学生向けのサークル掲示板WEBアプリ",
+  verification: {
+		google: "tuHWtjEYbjbvRhV8m_pXuitDzeuzodNAcge9xkNjPa8",
+		},
 };
 
 export default function RootLayout({
