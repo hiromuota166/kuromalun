@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../../utils/supabase';
 import { v4 as uuidv4 } from 'uuid';
+import { useRouter } from 'next/navigation';
 
 const CircleCreateEditPage: React.FC = () => {
   const [name, setName] = useState("");
@@ -16,6 +17,8 @@ const CircleCreateEditPage: React.FC = () => {
   const [image, setImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
+  const router = useRouter();
+
   const public_url = "https://ntbxlozqezrwdpqphirl.supabase.co/storage/v1/object/public/circle-image/"
 
   const handleChangeFile = (e: any) => {
@@ -110,6 +113,7 @@ const CircleCreateEditPage: React.FC = () => {
       alert("画像ファイル以外はアップロード出来ません。")
     }
     setIsLoading(false);
+    router.push('/user');
   };
 
   return (
