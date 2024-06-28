@@ -26,8 +26,6 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
       setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
       setAlertStatus("error");
     } else {
-      setAlertMessage('ログアウトしました');
-      setAlertStatus("success");
       router.push('/');
     }
     setIsAlertOpen(true);

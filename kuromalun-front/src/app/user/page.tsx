@@ -112,7 +112,7 @@ const Page: React.FC = () => {
             <TabPanel>
               <div className='w-full flex-1 flex flex-col items-center justify-start overflow-hidden' aria-label='ユーザー付属情報'>
                 <h2 className='text-xl font-bold mt-10'>あなたが作成したサークル</h2>
-                <ul className='w-4/5 mt-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4'>
+                <ul className='w-4/5 mt-5 grid grid-cols-1 gap-4'>
                   {circles.map((circle) => (
                     <li key={circle.uid} className='p-2 border rounded shadow cursor-pointer' onClick={() => handleCircleClick(circle)}>
                       <img src={circle.circlesImageId} alt={circle.name} className='w-full h-48 object-cover rounded' />
