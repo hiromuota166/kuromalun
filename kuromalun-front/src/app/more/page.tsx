@@ -2,12 +2,15 @@
 import { supabase } from "../../utils/supabase"
 import { useEffect, useState } from "react"
 import { v4 as uuidv4 } from 'uuid'
+import AlertComponent from '../../components/AlertComponent';
 
 export default function ImageApp() {
   const public_url = "https://jforbbjxywxfwurklxor.supabase.co/storage/v1/object/public/public-image-bucket/img/"
   const [urlList, setUrlList] = useState<string[]>([])
   const [loadingState, setLoadingState] = useState("hidden")
   const [previewUrl, setPreviewUrl] = useState<string | null>(null)
+  const [alertMessage, setAlertMessage] = useState<string | null>(null)
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('blue')
 
   const listAllImage = async () => {
     const tempUrlList: string[] = []
@@ -62,14 +65,18 @@ export default function ImageApp() {
         .from('public-image-bucket')
         .upload(`img/${uuidv4()}.${fileExtension}`, file!!)
       if (error) {
-        alert("エラーが発生しました：" + error.message)
+        setAlertMessage("エラーが発生しました：" + error.message);
+        setAlertColorScheme('red');
         return
       }
       setFile(null)
       setPreviewUrl(null)
       await listAllImage()
+      setAlertMessage("画像が正常にアップロードされました。");
+      setAlertColorScheme('blue');
     } else {
-      alert("画像ファイル以外はアップロード出来ません。")
+      setAlertMessage("画像ファイル以外はアップロード出来ません。");
+      setAlertColorScheme('red');
     }
   }
 
@@ -93,6 +100,13 @@ export default function ImageApp() {
           送信
         </button>
       </form>
+      {alertMessage && (
+        <AlertComponent 
+          message={alertMessage} 
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
+        />
+      )}
       <div className="w-full max-w-3xl">
         <div className={loadingState} aria-label="読み込み中">
           <div className="animate-spin h-10 w-10 border-4 border-blue-500 rounded-full border-t-transparent"></div>

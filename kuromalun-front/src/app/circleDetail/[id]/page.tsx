@@ -29,7 +29,7 @@ const CircleDetailPage = () => {
       .single();
 
     if (error) {
-      console.log('Error fetching circle details:', error);
+      console.error('Error fetching circle details:', error);
       return;
     }
 

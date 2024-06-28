@@ -11,7 +11,7 @@ interface Circle {
   place?: string;
   time?: string;
   size?: string;
-  link?: string;
+  link?: { title: string, url: string }[];
 }
 
 interface CircleUpdateModalProps {
@@ -38,6 +38,21 @@ export const CircleUpdateModal: React.FC<CircleUpdateModalProps> = ({ circle, is
     const { name, value } = e.target;
     if (editedCircle) {
       setEditedCircle({ ...editedCircle, [name]: value });
+    }
+  };
+
+  const handleLinkChange = (index: number, field: string, value: string) => {
+    if (editedCircle) {
+      const newLinks = [...(editedCircle.link || [])];
+      newLinks[index] = { ...newLinks[index], [field]: value };
+      setEditedCircle({ ...editedCircle, link: newLinks });
+    }
+  };
+
+  const addLinkField = () => {
+    if (editedCircle) {
+      const newLinks = [...(editedCircle.link || []), { title: '', url: '' }];
+      setEditedCircle({ ...editedCircle, link: newLinks });
     }
   };
 
@@ -150,13 +165,26 @@ export const CircleUpdateModal: React.FC<CircleUpdateModalProps> = ({ circle, is
                 placeholder="メンバー数"
                 mb={3}
               />
-              <Input
-                name="link"
-                value={editedCircle.link || ''}
-                onChange={handleChange}
-                placeholder="リンク"
-                mb={3}
-              />
+              <div>
+                {editedCircle.link && editedCircle.link.map((link, index) => (
+                  <div key={index} className="mb-3 p-4 border rounded shadow">
+                    <Input
+                      placeholder="リンクタイトル"
+                      value={link.title}
+                      onChange={(e) => handleLinkChange(index, 'title', e.target.value)}
+                      mb={2}
+                    />
+                    <Input
+                      placeholder="リンクURL"
+                      value={link.url}
+                      onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
+                    />
+                  </div>
+                ))}
+                <Button onClick={addLinkField} colorScheme="blue" mt={3}>
+                  リンクを追加
+                </Button>
+              </div>
             </div>
           )}
         </ModalBody>
