@@ -22,7 +22,7 @@ export const handleLogin = async (props: AuthProps): Promise<boolean> => {
     setAlertColorScheme('blue');
     return true;
   } catch (error) {
-    setAlertMessage("メールを認証してください。");
+    setAlertMessage("送信されたメールを認証してください。");
     setAlertColorScheme('red');
     return false;
   } finally {

@@ -19,7 +19,7 @@ const CircleCreateEditPage: React.FC = () => {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertColorScheme, setAlertColorScheme] = useState<string>("red");
+  const [alertColorScheme, setAlertColorScheme] = useState<string>("blue");
   const router = useRouter();
 
   const public_url = "https://ntbxlozqezrwdpqphirl.supabase.co/storage/v1/object/public/circle-image/"

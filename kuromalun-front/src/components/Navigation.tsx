@@ -12,7 +12,7 @@ const Navigation: React.FC = () => {
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('blue');
 
   useEffect(() => {
     const fetchUser = async () => {

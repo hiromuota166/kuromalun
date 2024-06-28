@@ -20,7 +20,7 @@ interface UserIconProps {
 const UserIconChakra = ({ w, h }: UserIconProps) => {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('blue');
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
