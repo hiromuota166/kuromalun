@@ -49,7 +49,7 @@ const Navigation: React.FC = () => {
       router.push(path);
     } else {
       setAlertMessage('ログインしてください');
-      setAlertColorScheme('red');
+      setAlertColorScheme('blue');
       router.push('/login');
     }
     setIsLoading(false);
