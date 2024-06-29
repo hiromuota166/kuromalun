@@ -10,7 +10,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertColorScheme, setAlertColorScheme] = useState<string>('red');
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('blue');
   const [isClient, setIsClient] = useState(false);
   const router = useRouter();
 

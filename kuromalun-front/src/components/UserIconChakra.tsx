@@ -1,11 +1,16 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { Icon } from '@chakra-ui/react';
+import { Icon, Spinner, Center } from '@chakra-ui/react';
 import { IoPersonCircle } from 'react-icons/io5';
 import { useRouter } from 'next/navigation';
 import { supabase } from '../utils/supabase';
-import { Menu, MenuButton, MenuList, MenuItem } from '@chakra-ui/react';
-import ConfirmationDialog from './ConfirmationDialog';
+import {
+  Menu,
+  MenuButton,
+  MenuList,
+  MenuItem,
+} from '@chakra-ui/react';
+import AlertComponent from './AlertComponent';
 
 interface UserIconProps {
   w: number;
@@ -15,38 +20,58 @@ interface UserIconProps {
 const UserIconChakra = ({ w, h }: UserIconProps) => {
   const [userImage, setUserImage] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
-  const [alertStatus, setAlertStatus] = useState<"error" | "info" | "warning" | "success" | "loading">("info");
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
-  const [isAlertOpen, setIsAlertOpen] = useState<boolean>(false);
+  const [alertColorScheme, setAlertColorScheme] = useState<string>('blue');
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const router = useRouter();
 
-  const handleLogout = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) {
-      setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
-      setAlertStatus("error");
+  const fetchUserImage = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data: userData } = await supabase
+        .from('users')
+        .select('userImage')
+        .eq('userId', user.id)
+        .single();
+      if (userData) {
+        setUserImage(userData.userImage);
+      } else {
+        setUserImage(null);
+      }
     } else {
-      router.push('/');
+      setUserImage(null);
     }
-    setIsAlertOpen(true);
+    setIsLoading(false);
   };
 
   useEffect(() => {
-    const fetchUserImage = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        const { data: userData } = await supabase
-          .from('users')
-          .select('userImage')
-          .eq('userId', user.id)
-          .single();
-        if (userData) {
-          setUserImage(userData.userImage);
-        }
-      }
-    };
     fetchUserImage();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(() => {
+      fetchUserImage();
+    });
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
+
+  const handleLogout = async () => {
+    setAlertMessage('本当にログアウトしますか？');
+    setAlertColorScheme('warning');
+    const confirmed = true;
+    if (confirmed) {
+      const { error } = await supabase.auth.signOut();
+      if (error) {
+        setAlertMessage(`ログアウトに失敗しました: ${error.message}`);
+        setAlertColorScheme('red');
+      } else {
+        setAlertMessage('ログアウトしました');
+        setAlertColorScheme('blue');
+        window.location.reload(); // ページをリロードする
+      }
+    }
+  };
+  
 
   const handleNavigation = async (path: string) => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -54,32 +79,26 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
       router.push(path);
     } else {
       setAlertMessage('ログインしてください');
-      setAlertStatus("warning");
-      setIsAlertOpen(true);
+      setAlertColorScheme('blue');
       router.push('/login');
     }
   };
 
-  const confirmLogout = () => {
-    setAlertMessage('本当にログアウトしますか？');
-    setAlertStatus("warning");
-    setShowConfirm(true);
-    setIsAlertOpen(true);
-  };
+  if (isLoading) {
+    return (
+      <Center>
+        <Spinner />
+      </Center>
+    );
+  }
 
   return (
     <div className='relative justify-center content-center'>
       {alertMessage && (
-        <ConfirmationDialog 
+        <AlertComponent 
           message={alertMessage} 
-          colorScheme={alertStatus} 
-          isOpen={isAlertOpen}
-          onClose={() => {
-            setIsAlertOpen(false);
-            setShowConfirm(false);
-          }}
-          showConfirmButtons={showConfirm}
-          onConfirm={handleLogout}
+          colorScheme={alertColorScheme} 
+          onClose={() => setAlertMessage(null)} 
         />
       )}
       <Menu isLazy>
@@ -104,7 +123,7 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
           <MenuItem onClick={() => handleNavigation('/set')}>
             Settings
           </MenuItem>
-          <MenuItem onClick={confirmLogout}>
+          <MenuItem onClick={handleLogout}>
             Log Out
           </MenuItem>
         </MenuList>
@@ -114,4 +133,3 @@ const UserIconChakra = ({ w, h }: UserIconProps) => {
 };
 
 export default UserIconChakra;
-
